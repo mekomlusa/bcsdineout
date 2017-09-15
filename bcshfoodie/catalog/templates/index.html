@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>BCSH Foodie Home</h1>
+
+  <p>Welcome to <em>BCSH Foodie Guide</em>, a very basic website developed for the CSCE 608 course.</p>
+  <p><em>BCSH: Bryan/College Station, and... Houston!</p>
+
+<h2>Dynamic counts</h2>
+
+  <p>The guide has the following record counts:</p>
+  <ul>
+    <li><strong>Categories:</strong> {{ num_category }}</li>
+    <li><strong>Restaurants:</strong> {{ num_restaurant }}</li>
+    <li><strong>Restaurants in the Bryan/College Station area:</strong> {{ num_bcs_res }}</li>
+    <li><strong>Yelp Reviews:</strong> {{ num_yelp_review }}</li>
+  </ul>
+
+{% endblock %}

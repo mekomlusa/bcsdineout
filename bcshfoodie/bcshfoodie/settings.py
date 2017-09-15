@@ -55,7 +55,9 @@ ROOT_URLCONF = 'bcshfoodie.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+                'catalog/templates',
+                ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

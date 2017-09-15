@@ -24,8 +24,8 @@ operation_hours = pd.DataFrame(columns=['Restaurant_id','hours_open_sunday','hou
                                  'hours_close_tuesday','hours_close_wednesday','hours_close_thursday','hours_close_friday',
                                  'hours_close_saturday'
                                 ])
-business = pd.DataFrame(columns=['Restaurant_id', 'Name', 'Latitude', 'Longtitude', 'Phone', 'Image_url','Address_1','Address_2','Address_3','City','State',
-                                 'Zip','Price','Yelp_rating','Yelp_url','Yelp_review_count'])
+business = pd.DataFrame(columns=['Restaurant_id', 'Name', 'Latitude', 'Longtitude', 'Phone', 'Image_url','Address','City','State',
+                                 'Zip','Price','Yelp_url'])
 reviews = pd.DataFrame(columns=['Restaurant_id','Review_user','Review_text','Review_url'])
 
 # read all files into a list
@@ -61,16 +61,19 @@ def restaurant(df):
         Address_1 = item['location'].get('address1','')
         Address_2 = item['location'].get('address2','')
         Address_3 = item['location'].get('address3','')
+        Address = xstr(Address_1) + " " + xstr(Address_2) + " " + xstr(Address_3)
         City = item['location'].get('city','')
         State = item['location'].get('state','')
         Zip = item['location'].get('zip_code','')
         Price = item.get('price','')
-        Yelp_rating = item.get('rating','')
         Yelp_url = item.get('url','')
-        Yelp_review_count = item.get('review_count','')
-        df.loc[len(df)+1]=[Restaurant_id,Name,Latitude,Longtitude,Phone,Image_url,Address_1,Address_2,
-               Address_3,City,State,Zip,Price,Yelp_rating,Yelp_url,Yelp_review_count]
+        df.loc[len(df)+1]=[Restaurant_id,Name,Latitude,Longtitude,Phone,Image_url,Address,City,State,Zip,Price,Yelp_url]
     
+# to convert None string. A little function from StackOverflow.
+def xstr(s):
+    if s is None:
+        return ''
+    return str(s)
     
 # further cleanup for the dataframe category
 def categories(df):
@@ -166,27 +169,27 @@ def output_file(df, fn):
         print "The details of the given dataframe has been saved under "+dir+" as "+outputname
         
 def main():
-#    load_restaurants("json_restaurant_list_2017-09-12 17-25-03.962000.csv")
-#    load_restaurants("json_restaurant_list_2017-09-12 17-32-48.300000.csv")
-#    load_restaurants("json_restaurant_list_2017-09-12 17-52-00.274000.csv")
-#    load_restaurants("json_restaurant_list_2017-09-12 17-59-41.852000.csv")
-    load_restaurants("json_restaurant_review_2017-09-13 14-12-00.154000.csv")
-    load_restaurants("json_restaurant_review_2017-09-13 14-32-50.790000.csv")
-#    print "Converting to json type..."
-#    convert_to_json(all_res_str)
-#    print "Extracting business table..."
-#    restaurant(business)
+    load_restaurants("json_restaurant_list_2017-09-12 17-25-03.962000.csv")
+    load_restaurants("json_restaurant_list_2017-09-12 17-32-48.300000.csv")
+    load_restaurants("json_restaurant_list_2017-09-12 17-52-00.274000.csv")
+    load_restaurants("json_restaurant_list_2017-09-12 17-59-41.852000.csv")
+#    load_restaurants("json_restaurant_review_2017-09-13 14-12-00.154000.csv")
+#    load_restaurants("json_restaurant_review_2017-09-13 14-32-50.790000.csv")
+    print "Converting to json type..."
+    convert_to_json(all_res_str)
+    print "Extracting business table..."
+    restaurant(business)
 #    print "Extracting categories table..."
 #    categories(category)
 #    print "Extracting operation hours table..."
 #    ops_hours(operation_hours)
-    print "Extracting the review table..."
-    review(reviews)
+#    print "Extracting the review table..."
+#    review(reviews)
     print "writing out the data frames..."
-#    output_file(business,"Business_table")
+    output_file(business,"Business_table")
 #    output_file(category,"Category_table")
 #    output_file(operation_hours,"Hours_table")
-    output_file(reviews,"Review_table")
+#    output_file(reviews,"Review_table")
     
     
 if __name__ == '__main__':
