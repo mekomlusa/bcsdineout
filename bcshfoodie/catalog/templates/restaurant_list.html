@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Restaurant List</h1>
+
+    {% if restaurant_list %}
+    <ul>
+
+      {% for r in restaurant_list %}
+      <li>
+        <a href="{{ r.get_absolute_url }}">{{ r.res_id }}</a> ({{r.name}})
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no restaurant in the record.</p>
+    {% endif %}       
+{% endblock %}

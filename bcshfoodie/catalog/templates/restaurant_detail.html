@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Restaurant Name: {{ restaurant.name }}</h1>
+
+  <p><strong>Address:</strong> {{ restaurant.address }}</p>
+  <p><strong>City:</strong> {{ restaurant.city }}</p> 
+  <p><strong>State:</strong> {{ restaurant.state }}</p>  
+  <p><strong>Phone:</strong> {{ restaurant.phone }}</p> 
+  <p><strong>Yelp link:</strong> {{ restaurant.yelp_url }}</p>   
+  <!-- <p><strong>Category:</strong> {% for c in book.category.all %} {{ c }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>  -->
+
+{% endblock %}

@@ -5,6 +5,12 @@ from django.shortcuts import render
 
 from .models import Category, Restaurant, Hour, YelpReview
 
+from django.views import generic
+
+from django.http import Http404
+
+from django.shortcuts import redirect
+
 # Create your views here.
 
 def index(request):
@@ -25,3 +31,16 @@ def index(request):
         'index.html',
         context={'num_category':num_category,'num_restaurant':num_restaurant,'num_bcs_res':num_bcs_res,'num_yelp_review':num_yelp_review},
     )
+    
+class RestaurantListView(generic.ListView):
+    model = Restaurant
+    context_object_name = 'restaurant_list'   # your own name for the list as a template variable
+    queryset = Restaurant.objects.all()[:5] # Get top 5 restaurants in College Station
+    template_name = 'restaurant_list.html'  # Specify your own template name/location
+    
+class RestaurantDetailView(generic.DetailView):
+    model = Restaurant
+    template_name = 'restaurant_detail.html'
+    def get_object(self):
+        return Restaurant.objects.get(res_id=self.kwargs.get("slug"))
+    

@@ -26,5 +26,7 @@ from catalog import views
 
 urlpatterns = [
         url(r'^$', views.index, name='index'),
+        url(r'^restaurants/$', views.RestaurantListView.as_view(), name='restaurants'),
+        url(r'^restaurant/(?P<slug>[-\w]+)$', views.RestaurantDetailView.as_view(), name='restaurant-detail'),
 
 ]

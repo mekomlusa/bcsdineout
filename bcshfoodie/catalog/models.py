@@ -30,6 +30,12 @@ class Restaurant(models.Model):
         String for representing the Model object.
         """
         return self.name
+    
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular instance of the model.
+        """
+        return reverse('restaurant-detail', args=[str(self.res_id)])
 
 class Category(models.Model):
     """
