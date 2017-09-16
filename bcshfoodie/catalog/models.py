@@ -5,7 +5,9 @@ from django.db import models
 
 from django.urls import reverse #Used to generate URLs by reversing the URL patterns
 
-import uuid 
+from django.db.models.aggregates import Count
+
+from random import randint
 # Create your models here.
 
 class Restaurant(models.Model):
@@ -36,6 +38,7 @@ class Restaurant(models.Model):
         Returns the url to access a particular instance of the model.
         """
         return reverse('restaurant-detail', args=[str(self.res_id)])
+    
 
 class Category(models.Model):
     """

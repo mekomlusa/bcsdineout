@@ -11,6 +11,10 @@ from django.http import Http404
 
 from django.shortcuts import redirect
 
+import random
+
+from django.db.models import Count
+
 # Create your views here.
 
 def index(request):
@@ -18,7 +22,7 @@ def index(request):
     View function for home page of site.
     """
     # Generate counts of some of the main objects
-    num_category=Category.objects.all().count()
+    num_category=Category.objects.values('name').distinct().count()
     num_restaurant=Restaurant.objects.all().count()
     # Available restaurant in BCS area
     num_bcs_res=Restaurant.objects.filter(city__in=['College Station','Bryan']).count()
@@ -35,12 +39,22 @@ def index(request):
 class RestaurantListView(generic.ListView):
     model = Restaurant
     context_object_name = 'restaurant_list'   # your own name for the list as a template variable
-    queryset = Restaurant.objects.all()[:5] # Get top 5 restaurants in College Station
+    queryset = Restaurant.objects.all() # Get top 5 restaurants in College Station
     template_name = 'restaurant_list.html'  # Specify your own template name/location
     
 class RestaurantDetailView(generic.DetailView):
     model = Restaurant
     template_name = 'restaurant_detail.html'
     def get_object(self):
-        return Restaurant.objects.get(res_id=self.kwargs.get("slug"))
+        return Restaurant.objects.get(res_id=self.kwargs.get("stub"))
+    
+class RestaurantRandomView(generic.DetailView):
+    model = Restaurant
+    template_name = 'restaurant_detail.html'
+    def get_object(self):
+        # todo: update the argument here
+        # return Restaurant.objects.all().order_by('?')[:1].get()
+        count = Restaurant.objects.all().count()
+        rand = random.randint(0,count)
+        return Restaurant.objects.all()[rand]
     

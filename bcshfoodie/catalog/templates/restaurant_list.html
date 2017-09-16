@@ -8,7 +8,7 @@
 
       {% for r in restaurant_list %}
       <li>
-        <a href="{{ r.get_absolute_url }}">{{ r.res_id }}</a> ({{r.name}})
+        <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
       </li>
       {% endfor %}
 

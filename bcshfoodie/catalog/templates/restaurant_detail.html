@@ -2,12 +2,14 @@
 
 {% block content %}
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
-
-  <p><strong>Address:</strong> {{ restaurant.address }}</p>
-  <p><strong>City:</strong> {{ restaurant.city }}</p> 
-  <p><strong>State:</strong> {{ restaurant.state }}</p>  
-  <p><strong>Phone:</strong> {{ restaurant.phone }}</p> 
-  <p><strong>Yelp link:</strong> {{ restaurant.yelp_url }}</p>   
+  <li><strong>Address:</strong> {{ restaurant.address}}</li>
+  <li><strong>City:</strong> {{ restaurant.city }}</li>
+  <li><strong>State:</strong> {{ restaurant.state }} </li>
+  <li><strong>Zipcode:</strong> {{ restaurant.zipcode }}</li>
+  <li><strong>Phone:</strong> {{ restaurant.phone }}</li>
+  <li><strong>Price Range:</strong> {{ restaurant.price }}</li>  
+  <li><strong>Yelp link:</strong> <a href="{{ restaurant.yelp_url }}" target="_blank">{{ restaurant.name }} on Yelp</a></li></br>
   <!-- <p><strong>Category:</strong> {% for c in book.category.all %} {{ c }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>  -->
+  <img src= {{ restaurant.image_url }} alt="Restaurant Pic" style="width:304px;height:228px" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
 
 {% endblock %}
