@@ -7,13 +7,12 @@ from .models import Category, Restaurant, Hour, YelpReview
 
 from django.views import generic
 
-from django.http import Http404
-
-from django.shortcuts import redirect
 
 import random
 
-from django.db.models import Count
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template import RequestContext, loader
 
 # Create your views here.
 
@@ -39,7 +38,7 @@ def index(request):
 class RestaurantListView(generic.ListView):
     model = Restaurant
     context_object_name = 'restaurant_list'   # your own name for the list as a template variable
-    queryset = Restaurant.objects.all() # Get top 5 restaurants in College Station
+    queryset = Restaurant.objects.all() # Get all restaurants in the database
     template_name = 'restaurant_list.html'  # Specify your own template name/location
     
 class RestaurantDetailView(generic.DetailView):
@@ -52,9 +51,24 @@ class RestaurantRandomView(generic.DetailView):
     model = Restaurant
     template_name = 'restaurant_detail.html'
     def get_object(self):
-        # todo: update the argument here
-        # return Restaurant.objects.all().order_by('?')[:1].get()
         count = Restaurant.objects.all().count()
         rand = random.randint(0,count)
         return Restaurant.objects.all()[rand]
+    
+class CategoryListView(generic.ListView):
+    model = Category
+    context_object_name = 'category_list'   # your own name for the list as a template variable
+    #queryset = Category.objects.values('name').distinct() # Get all distinct categories in the database
+    queryset = Category.objects.all().distinct('name')# Get all distinct categories in the database
+    template_name = 'category_list.html'  # Specify your own template name/location
+        
+class CategoryList2View(generic.ListView):
+   model = Category
+   context_object_name = "crlist"
+   template_name = 'category_detail.html'  # Specify your own template name/location
+   def get_queryset(self):
+       queryset = super(CategoryList2View, self).get_queryset()
+       queryset = queryset.filter(name=self.kwargs.get("stub"))
+       return queryset
+   
     

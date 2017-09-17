@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+	<h1>Category details!</h1>
+	
+    {% if crlist %}
+    <ul>
+
+      {% for c in crlist %}
+      <li>
+        <a href="{{ c.res.get_absolute_url }}">{{ c.res.name }}</a>
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no restaurant in the record.</p>
+    {% endif %}       
+{% endblock %}

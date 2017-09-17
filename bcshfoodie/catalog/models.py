@@ -51,7 +51,14 @@ class Category(models.Model):
         """
         String for representing the Model object (in Admin site etc.)
         """
-        return self.name    
+        return self.name
+    
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular instance of the model.
+        """
+        return reverse('category-list-2', args=[str(self.name)])
+      
     
 class Hour(models.Model):
     """

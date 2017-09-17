@@ -29,4 +29,6 @@ urlpatterns = [
         url(r'^restaurants/$', views.RestaurantListView.as_view(), name='restaurants'),
         url(r'^randall/$', views.RestaurantRandomView.as_view(), name='restaurant-random'),
         url(r'^restaurant/(?P<stub>[-\w ]+)$', views.RestaurantDetailView.as_view(), name='restaurant-detail'),
+        url(r'^categories/$', views.CategoryListView.as_view(), name='categories'),
+        url(r'^category/(?P<stub>[-\w ]+)/$', views.CategoryList2View.as_view(), name='category-list-2'),
 ]
