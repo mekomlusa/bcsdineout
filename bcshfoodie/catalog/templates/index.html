@@ -17,5 +17,7 @@
     <li><strong>Restaurants in the Bryan/College Station area:</strong> {{ num_bcs_res }}</li>
     <li><strong>Yelp Reviews:</strong> {{ num_yelp_review }}</li>
   </ul>
+  
+  <p>You have visited this page {{ num_visits }}{% if num_visits == 1 %} time{% else %} times{% endif %}.</p>
 
 {% endblock %}

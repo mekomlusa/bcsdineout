@@ -2,14 +2,22 @@
 
 {% block content %}
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
+  <img style = "float:right; margin:0px 100px 0px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
   <li><strong>Address:</strong> {{ restaurant.address}}</li>
   <li><strong>City:</strong> {{ restaurant.city }}</li>
   <li><strong>State:</strong> {{ restaurant.state }} </li>
   <li><strong>Zipcode:</strong> {{ restaurant.zipcode }}</li>
   <li><strong>Phone:</strong> {{ restaurant.phone }}</li>
   <li><strong>Price Range:</strong> {{ restaurant.price }}</li>  
-  <li><strong>Yelp link:</strong> <a href="{{ restaurant.yelp_url }}" target="_blank">{{ restaurant.name }} on Yelp</a></li></br>
-  <!-- <p><strong>Category:</strong> {% for c in book.category.all %} {{ c }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>  -->
-  <img src= {{ restaurant.image_url }} alt="Restaurant Pic" style="width:304px;height:228px" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
+  <li><strong>Yelp link:</strong> <a href="{{ restaurant.yelp_url }}" target="_blank">{{ restaurant.name }} on Yelp</a></li>
+  <li><strong>Category:</strong> {% for c in restaurant.category_set.all %} <a href="{{ c.get_absolute_url }}">{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</a></li>
+  <li><strong>Hours of Operations: </strong>
+  <div style="width: 180px">{% if restaurant.hour %}{{ restaurant.hour.hoursOfOpearation }}{% else %}No hour data is available.{% endif %}
+  </div></li>
+  <li><strong>Yelp Reviews:</strong></li>
+  <div style="width: 700px">
+  <ul style="list-style-type:square">{% for rv in restaurant.yelpreview_set.all %} 
+  <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}</ul>
+  </div>
 
 {% endblock %}

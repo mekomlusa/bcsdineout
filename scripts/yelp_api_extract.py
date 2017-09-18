@@ -23,6 +23,7 @@ import time
 import numpy as np
 import datetime
 import csv
+import pandas as pd
 
 
 # This client code can run on Python 2.x or 3.x.  Your imports can be
@@ -42,8 +43,8 @@ except ImportError:
 # OAuth credential placeholders that must be filled in by users.
 # You can find them on
 # https://www.yelp.com/developers/v3/manage_app
-CLIENT_ID = "YOUR ID"
-CLIENT_SECRET = "YOUR SECRET"
+CLIENT_ID = "2Slx3F97ZFV4IU3uImzXaw"
+CLIENT_SECRET = "9F6P1Y3SZRdHg1gYMZMxEJQLjer2TUI6IMe1wAEFbTLW6wxi2gNGcuubT1s8NyyA"
 
 
 # API constants, you shouldn't have to change these.
@@ -62,6 +63,11 @@ OFFSET = 0
 
 # list to save all json results.
 l=[]
+
+# load review given known business ids.
+btable = pd.read_csv("d:/my_env/bcsdineout/data/business_table2017-09-14 21-44-00.756000.csv",
+                     sep=',')
+BU = btable['Restaurant_id']
 
 
 def obtain_bearer_token(host, path):
@@ -179,6 +185,8 @@ def query_api(term, location):
     bearer_token = obtain_bearer_token(API_HOST, TOKEN_PATH)
 
     response = search(bearer_token, term, location)
+    
+#    Below is an example to load business from standard Yelp API.
 
     businesses = response.get('businesses')
 
@@ -188,13 +196,14 @@ def query_api(term, location):
 
     for b in businesses: 
         business_id = b['id']
+        
     
     # this part is to get business details.
-#        print(u'{0} businesses found, querying business info ' \
-#            'for the top result "{1}" ...'.format(
-#                len(businesses), business_id))
-#        response = get_business(bearer_token, business_id)
-#        l.append(response)
+        print(u'{0} businesses found, querying business info ' \
+            'for the top result "{1}" ...'.format(
+                len(businesses), business_id))
+        response = get_business(bearer_token, business_id)
+        l.append(response)
 
         # This part is to get review details.        
 
@@ -205,7 +214,22 @@ def query_api(term, location):
         temp =  business_id +","+str(response)
         l.append(temp)
 
+def query_api_business(business_id):
+    bearer_token = obtain_bearer_token(API_HOST, TOKEN_PATH)
+        
+    """Queries the API by the input values from the user.
 
+    Args:
+        term (str): The search term to query.
+        location (str): The location of the business to query.
+    """
+        
+    print(u'querying review info ' \
+        'for the top result "{0}" ...'.format(
+            business_id))
+    response = get_business_review(bearer_token, business_id)
+    temp =  business_id +","+str(response)
+    l.append(temp)
 
 parser = argparse.ArgumentParser()
 
@@ -219,9 +243,27 @@ input_values = parser.parse_args()
 
 # known issue: if the api returns till the end but the offset is still less than the limit,
 # it won't automatically break. You will need to manually interrupt. (To be fixed in the future)
-while OFFSET < 500:
+#while OFFSET < 1000:
+#    try:
+#        query_api(input_values.term, input_values.location)
+#    except HTTPError as error:
+#        sys.exit(
+#            'Encountered HTTP error {0} on {1}:\n {2}\nAbort program.'.format(
+#                error.code,
+#                error.url,
+#                error.read(),
+#            )
+#        )
+#    time.sleep(30.0)
+#    OFFSET = OFFSET + 50
+
+counter = 0
+for b in BU:    
     try:
-        query_api(input_values.term, input_values.location)
+        query_api_business(b)
+        counter += 1
+        if counter%50 == 0:
+            time.sleep(30)
     except HTTPError as error:
         sys.exit(
             'Encountered HTTP error {0} on {1}:\n {2}\nAbort program.'.format(
@@ -230,8 +272,6 @@ while OFFSET < 500:
                 error.read(),
             )
         )
-    time.sleep(30.0)
-    OFFSET = OFFSET + 50
 
 #save list (utf8 encoding)
 today = datetime.datetime.today()

@@ -169,27 +169,27 @@ def output_file(df, fn):
         print "The details of the given dataframe has been saved under "+dir+" as "+outputname
         
 def main():
-    load_restaurants("json_restaurant_list_2017-09-12 17-25-03.962000.csv")
-    load_restaurants("json_restaurant_list_2017-09-12 17-32-48.300000.csv")
-    load_restaurants("json_restaurant_list_2017-09-12 17-52-00.274000.csv")
-    load_restaurants("json_restaurant_list_2017-09-12 17-59-41.852000.csv")
-#    load_restaurants("json_restaurant_review_2017-09-13 14-12-00.154000.csv")
+#    load_restaurants("json_restaurant_list_2017-09-12 17-25-03.962000.csv")
+#    load_restaurants("json_restaurant_list_2017-09-12 17-32-48.300000.csv")
+#    load_restaurants("json_restaurant_list_2017-09-12 17-52-00.274000.csv")
+#    load_restaurants("json_restaurant_list_2017-09-12 17-59-41.852000.csv")
+    load_restaurants("json_restaurant_review_2017-09-17 20-21-17.818000.csv")
 #    load_restaurants("json_restaurant_review_2017-09-13 14-32-50.790000.csv")
-    print "Converting to json type..."
-    convert_to_json(all_res_str)
-    print "Extracting business table..."
-    restaurant(business)
+#    print "Converting to json type..."
+#    convert_to_json(all_res_str)
+#    print "Extracting business table..."
+#    restaurant(business)
 #    print "Extracting categories table..."
 #    categories(category)
 #    print "Extracting operation hours table..."
 #    ops_hours(operation_hours)
-#    print "Extracting the review table..."
-#    review(reviews)
+    print "Extracting the review table..."
+    review(reviews)
     print "writing out the data frames..."
-    output_file(business,"Business_table")
+#    output_file(business,"Business_table")
 #    output_file(category,"Category_table")
 #    output_file(operation_hours,"Hours_table")
-#    output_file(reviews,"Review_table")
+    output_file(reviews,"Review_table")
     
     
 if __name__ == '__main__':
