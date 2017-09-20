@@ -10,6 +10,8 @@ from django.db.models.aggregates import Count
 from random import randint
 
 from datetime import datetime
+
+from django.contrib.auth.models import User
 # Create your models here.
 
 class Restaurant(models.Model):
@@ -41,6 +43,14 @@ class Restaurant(models.Model):
         """
         return reverse('restaurant-detail', args=[str(self.res_id)])
     
+    class Meta:
+        """
+        To define user permissions here.
+        """
+        permissions = (("can_mark_fav", "Set restaurant as favorited"),
+                       ("can_mark_unfav", "Remove restaurant from favorite list"),
+                       ("can_add_note", "Add a note to a restaurant"),
+                       ("can_delete_note","Remove a note to a restaurant"))
 
 class Category(models.Model):
     """
@@ -137,3 +147,22 @@ class YelpReview(models.Model):
         Returns the url to access a particular review.
         """
         return '%s' % (self.review_url)
+
+# bookmark system
+class BookmarkBase(models.Model):
+    class Meta:
+        abstract = True
+ 
+    user = models.ForeignKey(User, verbose_name="User")
+ 
+    def __str__(self):
+        return self.user.username
+
+class BookmarkRestaurant(BookmarkBase):
+    class Meta:
+        db_table = "bookmark_restaurant"
+ 
+    obj = models.ForeignKey(Restaurant, verbose_name="Restaurant")
+    
+    def get_bookmark_count(self):
+        return self.bookmarkrestaurant_set().all().count()

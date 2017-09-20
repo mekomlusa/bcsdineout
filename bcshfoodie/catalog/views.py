@@ -3,18 +3,33 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 
-from .models import Category, Restaurant, Hour, YelpReview
+from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant
 
 from django.views import generic
+from django.views import View
+
+from django.contrib import auth
+from django.http import HttpResponse
 
 
 import random
+import json
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import RequestContext, loader
 
 from django.core.paginator import Paginator
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.contrib.auth.mixins import PermissionRequiredMixin
+
+from django.contrib.auth.models import User
+
+from forms import SignUpForm
+
+from django.contrib.auth import login, authenticate
 
 # Create your views here.
 
@@ -77,5 +92,68 @@ class CategoryList2View(generic.ListView):
        queryset = super(CategoryList2View, self).get_queryset()
        queryset = queryset.filter(name=self.kwargs.get("stub"))
        return queryset
-   
+
+class FavByUserListView(LoginRequiredMixin,generic.ListView):
+    """
+    Generic class-based view listing restaurants favorited by current user. 
+    """
+    model = BookmarkRestaurant
+    template_name ='restaurant_fav_by_user.html'
+    paginate_by = 10
     
+    def get_queryset(self):
+        return BookmarkRestaurant.objects.filter(user_id=self.request.user)
+
+# User signup view
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration\signup.html', {'form': form})
+
+# fav system
+# link: https://evileg.com/en/post/244/
+class AddBookmarkView(View):
+    # This variable will set the bookmark model to be processed
+    model = None
+
+    def post(self, request, pk):
+        # We need a user
+        user = auth.get_user(request)
+        # Trying to get a bookmark from the table, or create a new one
+        bookmark, created = self.model.objects.get_or_create(user=user, obj_id=pk)
+
+        return HttpResponse(
+            json.dumps({
+                "result": created,
+                "count": self.model.objects.filter(obj_id=pk).count()
+            }),
+            content_type="application/json"
+        )
+    
+class RmBookmarkView(View):
+    # This variable will set the bookmark model to be processed
+    model = None
+
+    def post(self, request, pk):
+        # We need a user
+        user = auth.get_user(request)
+        # Trying to get a bookmark from the table
+        bookmark = self.model.objects.get(user=user, obj_id=pk)
+        bookmark.delete()
+
+        return HttpResponse(
+            json.dumps({
+                "result": 'deleted',
+                "count": self.model.objects.filter(obj_id=pk).count()
+            }),
+            content_type="application/json"
+        )

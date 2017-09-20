@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Restaurants Favorited</h1>
+
+    {% if bookmarkrestaurant_list %}
+    <ul>
+
+      {% for br in bookmarkrestaurant_list %} 
+      <li>
+        <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>There is no restaurant favorited.</p>
+    {% endif %}       
+{% endblock %}

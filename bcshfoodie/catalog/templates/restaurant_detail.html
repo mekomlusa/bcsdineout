@@ -1,5 +1,6 @@
 {% extends "base_generic.html" %}
 
+
 {% block content %}
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
   <img style = "float:right; margin:0px 100px 0px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
@@ -16,8 +17,71 @@
   </div></li>
   <li><strong>Yelp Reviews:</strong></li>
   <div style="width: 700px">
-  <ul style="list-style-type:square">{% for rv in restaurant.yelpreview_set.all %} 
-  <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}</ul>
+  <ul style="list-style-type:square">{% if restaurant.yelpreview_set.all %}{% for rv in restaurant.yelpreview_set.all %} 
+  <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
   </div>
+  
+  	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
+	<button type="button">Add to Fav</button>
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="rmbookmark" title="Favorites" style="float:left;">
+	<button type="button">Remove from Fav</button>
+	</div>
+  
+
+<script type="text/javascript">
+function to_bookmarks()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+
+    $.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+        data : { 'obj' : pk },
+
+        success : function (json) {
+            current.find("[data-count='" + action + "']").text(json.count);
+        }
+		
+    });
+	
+	alert('Added to your favorite list!');
+
+    return false;
+}
+
+
+function rm_bookmarks()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+
+    $.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+        data : { 'obj' : pk },
+
+        success : function (json) {
+            current.find("[data-count='" + action + "']").text(json.count);
+        }
+
+    });
+	
+	alert('Removed from your favorite list!');
+
+    return false;
+}
+
+$(function() {
+    $('[data-action="addbookmark"]').click(to_bookmarks);
+	$('[data-action="rmbookmark"]').click(rm_bookmarks);
+});
+
+</script>
 
 {% endblock %}

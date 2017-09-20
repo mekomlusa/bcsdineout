@@ -12,6 +12,34 @@
   <!-- Add additional CSS in static file -->
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+// Getting a cookie by name
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+ 
+// Setup AJAX
+$(function () {
+    $.ajaxSetup({
+        headers: { "X-CSRFToken": getCookie("csrftoken") }
+    });
+});
+</script>
+  
 </head>
 
 <body>
@@ -26,6 +54,15 @@
           <li><a href="{% url 'restaurants' %}">All Restaurants</a></li>
           <li><a href="{% url 'categories' %}">All Categories</a></li>
 		  <li><a href="{% url 'restaurant-random' %}">PICK A RESTAURANT FOR ME (ALL)!</a></li>
+		  </br>
+		  {% if user.is_authenticated %}
+			 <li>Username: {{ user.get_username }}</li>
+			 <li><a href="{% url 'my-fav-res' %}">My Favorited Restaurants</a></li>
+			 <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
+		   {% else %}
+			 <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   
+			 <li><a href="{% url 'user-signup' %}">Sign up</a></li>
+		   {% endif %} 
       </ul>
      {% endblock %}
       </div>

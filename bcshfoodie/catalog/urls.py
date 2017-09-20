@@ -23,6 +23,11 @@ from django.conf.urls import url
 
 from catalog import views
 
+from django.contrib.auth.decorators import login_required
+ 
+from . import views
+
+from .models import BookmarkRestaurant
 
 urlpatterns = [
         url(r'^$', views.index, name='index'),
@@ -31,4 +36,16 @@ urlpatterns = [
         url(r'^restaurant/(?P<stub>[-\w ]+)$', views.RestaurantDetailView.as_view(), name='restaurant-detail'),
         url(r'^categories/$', views.CategoryListView.as_view(), name='categories'),
         url(r'^category/(?P<stub>[-\w ]+)/$', views.CategoryList2View.as_view(), name='category-list-2'),
+        url(r'^myfavres/$', views.FavByUserListView.as_view(), name='my-fav-res'),
+]
+
+#app_name = 'ajax'
+urlpatterns += [
+    url(r'^restaurant/(?P<pk>[-\w ]+)/addbookmark/$',
+        login_required(views.AddBookmarkView.as_view(model=BookmarkRestaurant)),
+        name='restaurant_bookmark'),
+    url(r'^restaurant/(?P<pk>[-\w ]+)/rmbookmark/$',
+        login_required(views.RmBookmarkView.as_view(model=BookmarkRestaurant)),
+        name='rm_restaurant_bookmark'),
+
 ]
