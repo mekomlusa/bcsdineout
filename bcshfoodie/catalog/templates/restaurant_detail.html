@@ -3,7 +3,12 @@
 
 {% block content %}
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
-  <img style = "float:right; margin:0px 100px 0px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
+
+	<img style = "float:right; margin:0px 0px 100px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
+
+
+
+  
   <li><strong>Address:</strong> {{ restaurant.address}}</li>
   <li><strong>City:</strong> {{ restaurant.city }}</li>
   <li><strong>State:</strong> {{ restaurant.state }} </li>
@@ -21,12 +26,20 @@
   <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
   </div>
   
+	{% if user.is_authenticated %}
   	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
 	<button type="button">Add to Fav</button>
 	</div>
 	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="rmbookmark" title="Favorites" style="float:left;">
 	<button type="button">Remove from Fav</button>
 	</div>
+	</br></br>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addnote" title="Notes" style="float:left;">
+	<button type="button">Add a note!</button>
+	</div>
+	{% else %}
+	<p><a href="{% url 'login'%}?next={{request.path}}">Login</a> or <a href="{% url 'user-signup' %}">register</a> to <strong>favorite</strong> or <strong>add a note</strong> to this restaurant!</p>
+	{% endif %}
   
 
 <script type="text/javascript">
@@ -41,14 +54,20 @@ function to_bookmarks()
         url : "/catalog/" + type + "/" + pk + "/" + action + "/",
         type : 'POST',
         data : { 'obj' : pk },
+		
+		success : function (json) {
+			if(json.err_code === 'Pass'){
+			current.find("[data-count='" + action + "']").text(json.count);
+			alert('Added to your favorite list!');
+			}
+		else if (json.err_code === 'Entry_existed'){
+               alert('ERROR! You have already favorited this restaurant.');
+            }
+		}
 
-        success : function (json) {
-            current.find("[data-count='" + action + "']").text(json.count);
-        }
 		
     });
 	
-	alert('Added to your favorite list!');
 
     return false;
 }
@@ -67,12 +86,46 @@ function rm_bookmarks()
         data : { 'obj' : pk },
 
         success : function (json) {
-            current.find("[data-count='" + action + "']").text(json.count);
-        }
+			if(json.err_code === 'Pass'){
+			current.find("[data-count='" + action + "']").text(json.count);
+			alert('Removed from your favorite list!');
+			}
+		else if (json.err_code === 'Entry_not_existed'){
+               alert('ERROR! You have not favorited this restaurant yet.');
+            }
+		}
 
     });
 	
-	alert('Removed from your favorite list!');
+
+    return false;
+}
+
+function add_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Note_existed'){
+			alert('ERROR! You have already written a note for this restaurant.');
+			window.location = "/catalog/myfavres";
+			}
+			else{
+			var url = "/catalog/" + type + "/" + pk + "/" + action;
+			window.location = url;
+			}
+		}
+
+    });
+	
+	
 
     return false;
 }
@@ -80,6 +133,7 @@ function rm_bookmarks()
 $(function() {
     $('[data-action="addbookmark"]').click(to_bookmarks);
 	$('[data-action="rmbookmark"]').click(rm_bookmarks);
+	$('[data-action="addnote"]').click(add_notes);
 });
 
 </script>

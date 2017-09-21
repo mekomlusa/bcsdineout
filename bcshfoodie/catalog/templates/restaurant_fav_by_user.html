@@ -3,17 +3,54 @@
 {% block content %}
     <h1>Restaurants Favorited</h1>
 
-    {% if bookmarkrestaurant_list %}
+<!--    {% if bookmarkrestaurant_list %}
     <ul>
 
       {% for br in bookmarkrestaurant_list %} 
+	  {% if br.user_id == user.id %}
       <li>
         <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
       </li>
+	  {% endif %}
       {% endfor %}
     </ul>
 
     {% else %}
       <p>There is no restaurant favorited.</p>
-    {% endif %}       
+    {% endif %} -->
+	
+{% if bookmarkrestaurant_list %}
+    <ul>
+
+      {% for br in bookmarkrestaurant_list %} 
+	  {% if br.user_id == user.id %}
+      <li>
+        <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
+      </li>
+	  {% endif %}
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>There is no restaurant favorited.</p>
+    {% endif %}
+
+	<h1>Notes Added</h1>
+
+    {% if notes %}
+    <ul>
+
+      {% for nr in notes %} 
+	  
+      <li>
+        Note for restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
+      </li>
+	  
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>There is no note for any restaurant.</p>
+    {% endif %} 
+	
 {% endblock %}

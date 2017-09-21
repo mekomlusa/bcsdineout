@@ -47,5 +47,6 @@ urlpatterns += [
     url(r'^restaurant/(?P<pk>[-\w ]+)/rmbookmark/$',
         login_required(views.RmBookmarkView.as_view(model=BookmarkRestaurant)),
         name='rm_restaurant_bookmark'),
-
+    url(r'^restaurant/(?P<pk>[-\w ]+)/addnote/$',
+        login_required(views.addNote), name='restaurant_note'),
 ]

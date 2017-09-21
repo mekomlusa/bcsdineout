@@ -166,3 +166,23 @@ class BookmarkRestaurant(BookmarkBase):
     
     def get_bookmark_count(self):
         return self.bookmarkrestaurant_set().all().count()
+    
+# Note system
+class NoteBase(models.Model):
+    class Meta:
+        abstract = True
+ 
+    user = models.ForeignKey(User, verbose_name="User")
+ 
+    def __str__(self):
+        return self.user.username
+
+class NoteRestaurant(NoteBase):
+    class Meta:
+        db_table = "note_restaurant"
+ 
+    obj = models.ForeignKey(Restaurant, verbose_name="Restaurant")
+    note = models.CharField(max_length=1000,default='None')
+    
+    def get_notes_count(self):
+        return self.noterestaurant_set().all().count()

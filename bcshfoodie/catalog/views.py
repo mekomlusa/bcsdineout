@@ -3,20 +3,19 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 
-from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant
+from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant, NoteBase, NoteRestaurant
 
 from django.views import generic
 from django.views import View
 
 from django.contrib import auth
-from django.http import HttpResponse
-
-
+from django.http import HttpResponse, HttpResponseNotFound, JsonResponse, HttpResponseRedirect
+   
 import random
 import json
 
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404, render_to_response
+
 from django.template import RequestContext, loader
 
 from django.core.paginator import Paginator
@@ -27,9 +26,13 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.contrib.auth.models import User
 
-from forms import SignUpForm
+from . forms import SignUpForm, NoteForm
 
 from django.contrib.auth import login, authenticate
+
+from django.core.urlresolvers import reverse
+
+from itertools import chain
 
 # Create your views here.
 
@@ -97,12 +100,22 @@ class FavByUserListView(LoginRequiredMixin,generic.ListView):
     """
     Generic class-based view listing restaurants favorited by current user. 
     """
-    model = BookmarkRestaurant
+    model = BookmarkRestaurant, NoteRestaurant
     template_name ='restaurant_fav_by_user.html'
     paginate_by = 10
     
     def get_queryset(self):
-        return BookmarkRestaurant.objects.filter(user_id=self.request.user)
+         return BookmarkRestaurant.objects.filter(user_id=self.request.user)
+#        bm = BookmarkRestaurant.objects.filter(user_id=self.request.user)
+#        nu = NoteRestaurant.objects.filter(user_id=self.request.user)
+#        result_list = sorted(chain(bm, nu))
+#        return result_list
+    
+    def get_context_data(self, **kwargs):
+        context =  super(FavByUserListView, self).get_context_data(**kwargs)
+        queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user)
+        context['notes'] = queryset2
+        return context
 
 # User signup view
 def signup(request):
@@ -124,36 +137,68 @@ def signup(request):
 class AddBookmarkView(View):
     # This variable will set the bookmark model to be processed
     model = None
+    permission_required = ('can_mark_fav','can_mark_unfav')
 
     def post(self, request, pk):
         # We need a user
         user = auth.get_user(request)
         # Trying to get a bookmark from the table, or create a new one
+        # if the bookmark instance has already been created in the system
+        if self.model.objects.filter(user=user, obj_id=pk).exists():
+            return JsonResponse({
+            'success': False, 
+            'err_code': 'Entry_existed', 
+        })
+        
+        # otherwise this is a new restaurant that user would like to bookmark!    
         bookmark, created = self.model.objects.get_or_create(user=user, obj_id=pk)
 
-        return HttpResponse(
-            json.dumps({
-                "result": created,
-                "count": self.model.objects.filter(obj_id=pk).count()
-            }),
-            content_type="application/json"
-        )
+        return JsonResponse({
+            'success': True, 
+            'err_code': 'Pass', 
+        })
     
 class RmBookmarkView(View):
     # This variable will set the bookmark model to be processed
     model = None
+    permission_required = ('can_mark_fav','can_mark_unfav')
 
     def post(self, request, pk):
         # We need a user
         user = auth.get_user(request)
         # Trying to get a bookmark from the table
+        # if the bookmark instance has not been created in the system
+        if not self.model.objects.filter(user=user, obj_id=pk).exists():
+            return JsonResponse({
+            'success': False, 
+            'err_code': 'Entry_not_existed', 
+        })
+    
+        # otherwise this is an existing restaurant that user would like to remove!
         bookmark = self.model.objects.get(user=user, obj_id=pk)
         bookmark.delete()
 
-        return HttpResponse(
-            json.dumps({
-                "result": 'deleted',
-                "count": self.model.objects.filter(obj_id=pk).count()
-            }),
-            content_type="application/json"
-        )
+        return JsonResponse({
+            'success': True, 
+            'err_code': 'Pass', 
+        })
+    
+# note system
+def addNote(request, pk):
+    if NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+            return JsonResponse({
+            'success': False, 
+            'err_code': 'Note_existed', 
+        })
+    
+    res = get_object_or_404(Restaurant, pk=pk)
+    form = NoteForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        u = request.user
+        comment.user = u
+        comment.obj = res
+        comment.save()
+        return redirect('my-fav-res')
+    return render(request, 'notes.html', 
+                              { 'form': form, 'restaurant':res, 'user':request.user })

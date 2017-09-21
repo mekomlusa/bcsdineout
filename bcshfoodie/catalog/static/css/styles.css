@@ -3,3 +3,27 @@
     padding: 0;
     list-style: none;
 }
+.content-panel{
+  overflow: auto; /* keep the float contained within this panel */
+  border: 1px dotted blue;
+}
+.thumb-panel {
+  float: left;
+  width: 100px;
+  border: 1px solid gray;
+  text-align: center;
+  margin-right: 20px; /* for example */
+}
+.thumb-panel img {
+  display: inline-block;
+  margin-bottom: 20px; /* for example */
+}
+.thumb-panel button{
+  display: inline-block;
+  margin-bottom: 20px;
+}
+.text-panel {
+  overflow: auto; /* prevents text flow wrapping around floated panel */
+  border: 1px solid gray;
+
+}
