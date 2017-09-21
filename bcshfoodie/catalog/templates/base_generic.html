@@ -58,6 +58,7 @@ $(function () {
 		  {% if user.is_authenticated %}
 			 <li>Username: {{ user.get_username }}</li>
 			 <li><a href="{% url 'my-fav-res' %}">My Restaurant Profile</a></li>
+			 <li><a href="{% url 'community' %}">Community Status</a></li>
 			 <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
 		   {% else %}
 			 <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   

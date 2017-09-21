@@ -182,7 +182,7 @@ class NoteRestaurant(NoteBase):
         db_table = "note_restaurant"
  
     obj = models.ForeignKey(Restaurant, verbose_name="Restaurant")
-    note = models.CharField(max_length=1000,default='None')
+    note = models.TextField(max_length=1000,default='None')
     
     def get_notes_count(self):
         return self.noterestaurant_set().all().count()

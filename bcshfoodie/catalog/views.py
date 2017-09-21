@@ -34,6 +34,8 @@ from django.core.urlresolvers import reverse
 
 from itertools import chain
 
+from django.db.models import Q
+
 # Create your views here.
 
 def index(request):
@@ -71,6 +73,12 @@ class RestaurantDetailView(generic.DetailView):
     def get_object(self):
         return Restaurant.objects.get(res_id=self.kwargs.get("stub"))
     
+    def get_context_data(self, **kwargs):
+        context =  super(RestaurantDetailView, self).get_context_data(**kwargs)
+        queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
+        context['notes'] = queryset2
+        return context
+    
 class RestaurantRandomView(generic.DetailView):
     model = Restaurant
     template_name = 'restaurant_detail.html'
@@ -106,10 +114,6 @@ class FavByUserListView(LoginRequiredMixin,generic.ListView):
     
     def get_queryset(self):
          return BookmarkRestaurant.objects.filter(user_id=self.request.user)
-#        bm = BookmarkRestaurant.objects.filter(user_id=self.request.user)
-#        nu = NoteRestaurant.objects.filter(user_id=self.request.user)
-#        result_list = sorted(chain(bm, nu))
-#        return result_list
     
     def get_context_data(self, **kwargs):
         context =  super(FavByUserListView, self).get_context_data(**kwargs)
@@ -202,3 +206,54 @@ def addNote(request, pk):
         return redirect('my-fav-res')
     return render(request, 'notes.html', 
                               { 'form': form, 'restaurant':res, 'user':request.user })
+    
+def updateNote(request, pk):
+    if not NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+            return JsonResponse({
+            'success': False, 
+            'err_code': 'Note_non_existed', 
+        })
+    
+    res = get_object_or_404(Restaurant, pk=pk)
+    existing_note = NoteRestaurant.objects.get(user=request.user, obj_id=pk)
+    form = NoteForm(request.POST or None, instance=existing_note)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        u = request.user
+        comment.user = u
+        comment.obj = res
+        comment.save()
+        return redirect('my-fav-res')
+    return render(request, 'notes.html', 
+                              { 'form': form, 'restaurant':res, 'user':request.user })
+    
+def deleteNote(request, pk):
+    if not NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+            return JsonResponse({
+            'success': False, 
+            'err_code': 'Note_non_existed', 
+        })
+    
+    existing_note = NoteRestaurant.objects.get(user=request.user, obj_id=pk)
+    existing_note.delete()
+    return JsonResponse({
+        'success': True, 
+        'err_code': 'Pass', 
+    })
+    
+class CommunityView(LoginRequiredMixin,generic.ListView):
+    """
+    Generic class-based view listing restaurants favorited by current user. 
+    """
+    model = BookmarkRestaurant, NoteRestaurant
+    template_name ='community.html'
+    paginate_by = 25
+    
+    def get_queryset(self):
+         return BookmarkRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
+    
+    def get_context_data(self, **kwargs):
+        context =  super(CommunityView, self).get_context_data(**kwargs)
+        queryset2 = NoteRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
+        context['notes'] = queryset2
+        return context

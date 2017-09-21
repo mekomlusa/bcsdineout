@@ -24,8 +24,9 @@
   <div style="width: 700px">
   <ul style="list-style-type:square">{% if restaurant.yelpreview_set.all %}{% for rv in restaurant.yelpreview_set.all %} 
   <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
-  </div>
+  <br/>
   
+  </div>
 	{% if user.is_authenticated %}
   	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
 	<button type="button">Add to Fav</button>
@@ -34,8 +35,21 @@
 	<button type="button">Remove from Fav</button>
 	</div>
 	</br></br>
+	{% if notes %}
+	{% for n in notes %}
+	<p>My note for this restaurant: {{ n.note }}</p>
+	{% endfor %}
+	{% else %}
+	<p>No note for this restaurant yet.</p>
+	{% endif %}
 	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addnote" title="Notes" style="float:left;">
 	<button type="button">Add a note!</button>
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="updatenote" title="Notes" style="float:left;">
+	<button type="button">Update the note</button>
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="deletenote" title="Notes" style="float:left;">
+	<button type="button">Delete the note</button>
 	</div>
 	{% else %}
 	<p><a href="{% url 'login'%}?next={{request.path}}">Login</a> or <a href="{% url 'user-signup' %}">register</a> to <strong>favorite</strong> or <strong>add a note</strong> to this restaurant!</p>
@@ -130,10 +144,71 @@ function add_notes()
     return false;
 }
 
+function update_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Note_non_existed'){
+			alert('ERROR! You do not have a note for this restaurant yet.');
+			var url = "/catalog/" + type + "/" + pk + "/addnote/";
+			window.location = url;
+			}
+			else{
+			var url = "/catalog/" + type + "/" + pk + "/" + action;
+			window.location = url;
+			}
+		}
+
+    });
+	
+	
+
+    return false;
+}
+
+function delete_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Pass'){
+			alert('Note has been successfully removed!');
+			window.location.reload();
+			}
+		else if (json.err_code === 'Note_non_existed'){
+               alert('ERROR! You do not have a note for this restaurant yet.');
+            }
+		}
+
+    });
+	
+	
+
+    return false;
+}
+
+
 $(function() {
     $('[data-action="addbookmark"]').click(to_bookmarks);
 	$('[data-action="rmbookmark"]').click(rm_bookmarks);
 	$('[data-action="addnote"]').click(add_notes);
+	$('[data-action="updatenote"]').click(update_notes);
+	$('[data-action="deletenote"]').click(delete_notes);
 });
 
 </script>

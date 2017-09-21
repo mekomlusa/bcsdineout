@@ -16,7 +16,9 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
         
 class NoteForm(forms.ModelForm):
-    note = forms.CharField(max_length=1000,help_text="Enter your note to the restaurant here.")
+    note = forms.CharField(max_length=1000,
+                           help_text="Enter your note to the restaurant here. Maximum length 1000.",
+                           required=True, widget = forms.Textarea)
 
     def clean_note(self):
         data = self.cleaned_data['note']

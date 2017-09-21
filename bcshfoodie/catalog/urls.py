@@ -49,4 +49,10 @@ urlpatterns += [
         name='rm_restaurant_bookmark'),
     url(r'^restaurant/(?P<pk>[-\w ]+)/addnote/$',
         login_required(views.addNote), name='restaurant_note'),
+    url(r'^restaurant/(?P<pk>[-\w ]+)/updatenote/$',
+        login_required(views.updateNote), name='restaurant_note_update'),
+    url(r'^restaurant/(?P<pk>[-\w ]+)/deletenote/$',
+        login_required(views.deleteNote), name='restaurant_note_delete'),
+    url(r'^community/$',
+        login_required(views.CommunityView.as_view()), name='community'),
 ]
