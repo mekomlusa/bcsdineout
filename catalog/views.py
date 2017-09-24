@@ -103,6 +103,7 @@ class CategoryList2View(generic.ListView):
    model = Category
    context_object_name = "crlist"
    template_name = 'category_detail.html'  # Specify your own template name/location
+   paginate_by = 25
    def get_queryset(self):
        queryset = super(CategoryList2View, self).get_queryset()
        queryset = queryset.filter(name=self.kwargs.get("stub"))
@@ -276,7 +277,9 @@ def search2(request):
                 reduce(operator.and_,
                        (Q(address__icontains=q) for q in query_list)) |
                 reduce(operator.and_,
-                       (Q(city__icontains=q) for q in query_list)) 
+                       (Q(city__icontains=q) for q in query_list)) |
+                reduce(operator.and_,
+                       (Q(category__name__icontains=q) for q in query_list))
             )
             paginator = Paginator(result, 15)
             page = request.GET.get('page', 1)
