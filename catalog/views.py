@@ -280,7 +280,7 @@ def search2(request):
                        (Q(city__icontains=q) for q in query_list)) |
                 reduce(operator.and_,
                        (Q(category__name__icontains=q) for q in query_list))
-            )
+            ).distinct()
             paginator = Paginator(result, 15)
             page = request.GET.get('page', 1)
             result = paginator.page(page)

@@ -85,14 +85,7 @@ WSGI_APPLICATION = 'bcshfoodie.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 # RL 9/12: this needs to be updated once psql info is available on heroku
 DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'denaqo0d0ssqru',
-#        'USER': 'izhmxznvrqjjno',
-#        'PASSWORD': '4928cb7ccf9aa5d1a5eba00b786b29c613824a8bcbae1e610e69982d39265ebc',
-#        'HOST': 'ec2-23-23-248-247.compute-1.amazonaws.com',
-#        'PORT': '5432',
-#    }
+
 }
 DATABASES['default'] =  dj_database_url.config()
 
