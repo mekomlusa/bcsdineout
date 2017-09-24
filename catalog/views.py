@@ -78,6 +78,9 @@ class RestaurantDetailView(generic.DetailView):
         return Restaurant.objects.get(res_id=self.kwargs.get("stub"))
     
     def get_context_data(self, **kwargs):
+        if not self.request.user.is_authenticated:
+            return None
+        
         context =  super(RestaurantDetailView, self).get_context_data(**kwargs)
         queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
         context['notes'] = queryset2
