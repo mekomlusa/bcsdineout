@@ -140,7 +140,7 @@ def signup(request):
             return redirect('/')
     else:
         form = SignUpForm()
-    return render(request, 'registration\signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
 
 # fav system
 # link: https://evileg.com/en/post/244/
