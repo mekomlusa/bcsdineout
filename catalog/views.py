@@ -284,7 +284,7 @@ def search2(request):
             paginator = Paginator(result, 15)
             page = request.GET.get('page', 1)
             result = paginator.page(page)
-            return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query})
+            return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query, 'term': query})
     else:
         message = 'You submitted an empty form.'
     return HttpResponse(message)
