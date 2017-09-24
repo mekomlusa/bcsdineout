@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Community Activities</h1>
+	<h2>See how other users are exploring new restaurants!</h2>
+
+{% if bookmarkrestaurant_list %}
+    <ul>
+
+      {% for br in bookmarkrestaurant_list %} 
+      <li>
+        {{ br.user.username }} favorited this restaurant: <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>Nobody has favorited any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</a></p>
+    {% endif %}
+
+{% if notes %}
+    <ul>
+
+      {% for nr in notes %} 
+	  
+      <li>
+        {{ nr.user.username }} added a note to this restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
+      </li>
+	  
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>Nobody has added a note any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</p>
+    {% endif %} 
+	
+{% endblock %}

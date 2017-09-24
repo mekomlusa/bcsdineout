@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+{% load bootstrap3 %}
+{% block content %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% bootstrap_messages %}
+
+    <h1>Search</h1>
+	<p>Type your search term here:</p>
+    <form action="/search/" method="get">
+        <input type="text" name="q">
+		</br></br>
+		{% buttons %}
+		<button type="submit" class="btn btn-primary">
+		{% bootstrap_icon "ok" %} Submit
+		</button>
+  {% endbuttons %}
+    </form>
+
+	{% endblock %}

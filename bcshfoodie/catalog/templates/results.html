@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+{% load bootstrap3 %}
+{% block content %}
+
+<h1>Search Results</h1>
+
+{% if results %}
+  {% for r in results %}
+  <ul style="list-style-type:square">
+    <li> <a href="{{ r.get_absolute_url }}">{{ r.name }}</a>
+  </ul>
+  {% endfor %}
+  {% bootstrap_pagination results url=query %}
+
+  
+{% else %}
+    <h3 class='error'>No result is found.</h3>
+
+{% endif %}
+<br/>
+<a href="{% url 'search' %}">Start a new search</a>
+
+{% endblock %}
