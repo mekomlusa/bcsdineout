@@ -21,7 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = '5y*lna-=j)b)2fs@gx#x&ug3cowusfdzo^jt@%f7b0edv4!vnz'
-import os
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '5y*lna-=j)b)2fs@gx#x&ug3cowusfdzo^jt@%f7b0edv4!vnz')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -140,4 +139,9 @@ STATIC_URL = '/static/'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
+EMAIL_HOST= 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
