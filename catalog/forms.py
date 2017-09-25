@@ -14,6 +14,9 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', )
+        help_texts = {
+            'password1': 'Your password can''t be too similar to your other personal information. Your password must contain at least 8 characters. Your password can''t be a commonly used password. Your password can''t be entirely numeric.',
+        }
         
 class NoteForm(forms.ModelForm):
     note = forms.CharField(max_length=1000,
