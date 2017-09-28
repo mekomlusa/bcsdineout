@@ -11,7 +11,7 @@
 
 	<img style = "float:right; margin:0px 0px 100px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
 
-
+  <div id="map" style="width: 304px; height: 300px; clear: both; float: right; text-align: left;";></div>
 
   
   <li><strong>Address:</strong> {{ restaurant.address}}</li>
@@ -30,10 +30,13 @@
   <ul style="list-style-type:square">{% if restaurant.yelpreview_set.all %}{% for rv in restaurant.yelpreview_set.all %} 
   <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
   <br/>
+
+    
   
-  </div>
+  
+ 
 	{% if user.is_authenticated %}
-  	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
+  	<div id="addbookmark" data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
 	{% buttons %}
 		<button type="submit" class="btn btn-primary">
 		{% bootstrap_icon "star" %} Add to Fav
@@ -105,8 +108,18 @@ function to_bookmarks()
             }
 		}
 
-		
-    });
+
+});
+
+	//var div = document.getElementById('addbookmark');
+    //if (div.style.display !== 'none') {
+    //    div.style.display = 'none';
+    //}
+    //else {
+    //    div.style.display = 'block';
+    //}
+
+
 	
 
     return false;
@@ -236,6 +249,31 @@ $(function() {
 	$('[data-action="updatenote"]').click(update_notes);
 	$('[data-action="deletenote"]').click(delete_notes);
 });
+
+function initMap() {
+        var rl = {lat: parseFloat("{{ restaurant.latitude }}"), lng: parseFloat("{{ restaurant.longtitude }}")};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: rl
+        });
+
+        var contentString = "{{ restaurant.name }}</br> Link: <a href=\"{{ restaurant.yelp_url }}\" target=\"_blank\">{{ restaurant.name }} on Yelp</a>";
+
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+        var marker = new google.maps.Marker({
+          position: rl,
+          map: map,
+          title: "{{ restaurant.name }}"
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      }
+	  
+	  google.maps.event.addDomListener(window, "load", initMap);
 
 </script>
 

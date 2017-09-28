@@ -187,3 +187,24 @@ class NoteRestaurant(NoteBase):
     
     def get_notes_count(self):
         return self.noterestaurant_set().all().count()
+    
+# combined system
+class URBase(models.Model):
+    class Meta:
+        abstract = True
+ 
+    user = models.ForeignKey(User, verbose_name="User")
+ 
+    def __str__(self):
+        return self.user.username
+
+class URRestaurant(NoteBase):
+    class Meta:
+        db_table = "user_restaurant_sys"
+ 
+    obj = models.ForeignKey(Restaurant, verbose_name="Restaurant")
+    like = models.BooleanField(default=False)
+    note = models.TextField(max_length=1000,default='None')
+    
+    def get_UR_count(self):
+        return self.noterestaurant_set().all().count()

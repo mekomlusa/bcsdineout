@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant, NoteBase, NoteRestaurant
+from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant, NoteBase, NoteRestaurant, URRestaurant, URBase
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.forms import BaseModelFormSet
@@ -31,7 +31,7 @@ class NoteForm(forms.ModelForm):
         return data
     
     class Meta:
-        model = NoteRestaurant
+        model = URRestaurant
         fields = ('note', )
 
 class SearchForm(forms.ModelForm):

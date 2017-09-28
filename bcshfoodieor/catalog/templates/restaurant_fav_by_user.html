@@ -3,11 +3,11 @@
 {% block content %}
     <h1>Restaurants Favorited</h1>
 
-{% if bookmarkrestaurant_list %}
+{% if urrestaurant_list %}
     <ul>
 
-      {% for br in bookmarkrestaurant_list %} 
-	  {% if br.user_id == user.id %}
+      {% for br in urrestaurant_list %} 
+	  {% if br.user_id == user.id and br.like == True %}
       <li>
         <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
       </li>
@@ -21,15 +21,16 @@
 
 	<h1>Notes Added</h1>
 
-    {% if notes %}
+    {% if urrestaurant_list %}
     <ul>
 
-      {% for nr in notes %} 
+      {% for nr in urrestaurant_list %} 
+	  {% if nr.user_id == user.id and nr.note != 'None' %}
 	  
       <li>
         Note for restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
       </li>
-	  
+	   {% endif %}
       {% endfor %}
     </ul>
 

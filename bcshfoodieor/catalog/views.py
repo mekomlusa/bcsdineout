@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render
 
-from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant, NoteBase, NoteRestaurant
+from .models import Category, Restaurant, Hour, YelpReview, BookmarkBase, BookmarkRestaurant, NoteBase, NoteRestaurant, URRestaurant, URBase
 
 from django.views import generic
 from django.views import View
@@ -78,9 +78,10 @@ class RestaurantDetailView(generic.DetailView):
         return Restaurant.objects.get(res_id=self.kwargs.get("stub"))
     
     def get_context_data(self, **kwargs):
-        context =  super(RestaurantDetailView, self).get_context_data(**kwargs)
-        queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
-        context['notes'] = queryset2
+        context = super(RestaurantDetailView, self).get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
+            context['notes'] = queryset2
         return context
     
 class RestaurantRandomView(generic.DetailView):
@@ -102,6 +103,7 @@ class CategoryList2View(generic.ListView):
    model = Category
    context_object_name = "crlist"
    template_name = 'category_detail.html'  # Specify your own template name/location
+   paginate_by = 25
    def get_queryset(self):
        queryset = super(CategoryList2View, self).get_queryset()
        queryset = queryset.filter(name=self.kwargs.get("stub"))
@@ -111,18 +113,12 @@ class FavByUserListView(LoginRequiredMixin,generic.ListView):
     """
     Generic class-based view listing restaurants favorited by current user. 
     """
-    model = BookmarkRestaurant, NoteRestaurant
+    model = URRestaurant
     template_name ='restaurant_fav_by_user.html'
     paginate_by = 10
     
     def get_queryset(self):
-         return BookmarkRestaurant.objects.filter(user_id=self.request.user)
-    
-    def get_context_data(self, **kwargs):
-        context =  super(FavByUserListView, self).get_context_data(**kwargs)
-        queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user)
-        context['notes'] = queryset2
-        return context
+         return URRestaurant.objects.filter(user_id=self.request.user)
 
 # User signup view
 def signup(request):
@@ -137,88 +133,105 @@ def signup(request):
             return redirect('/')
     else:
         form = SignUpForm()
-    return render(request, 'registration\signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
 
 # fav system
 # link: https://evileg.com/en/post/244/
-class AddBookmarkView(View):
-    # This variable will set the bookmark model to be processed
-    model = None
-    permission_required = ('can_mark_fav','can_mark_unfav')
-
-    def post(self, request, pk):
-        # We need a user
-        user = auth.get_user(request)
-        # Trying to get a bookmark from the table, or create a new one
-        # if the bookmark instance has already been created in the system
-        if self.model.objects.filter(user=user, obj_id=pk).exists():
+def bmpost(request, pk):
+    # We need a user
+    user = auth.get_user(request)
+    # Trying to get a bookmark from the table, or create a new one
+    # if the bookmark instance has already been created in the system and user has already liked it
+    if URRestaurant.objects.filter(user=user, obj_id=pk).exists():
+        if URRestaurant.objects.get(user=user, obj_id=pk).like == True:
             return JsonResponse({
             'success': False, 
             'err_code': 'Entry_existed', 
-        })
-        
-        # otherwise this is a new restaurant that user would like to bookmark!    
-        bookmark, created = self.model.objects.get_or_create(user=user, obj_id=pk)
+            })
+        ulike = URRestaurant.objects.get(user=user, obj_id=pk)
+        ulike.like = True
+        ulike.save()
+    else:
+        # otherwise this is a new restaurant that user would like to bookmark!
+        URRestaurant.objects.create(user=user, obj_id=pk, like=True)
 
-        return JsonResponse({
-            'success': True, 
-            'err_code': 'Pass', 
-        })
+    return JsonResponse({
+        'success': True, 
+        'err_code': 'Pass', 
+    })
     
-class RmBookmarkView(View):
-    # This variable will set the bookmark model to be processed
-    model = None
-    permission_required = ('can_mark_fav','can_mark_unfav')
-
-    def post(self, request, pk):
-        # We need a user
-        user = auth.get_user(request)
-        # Trying to get a bookmark from the table
-        # if the bookmark instance has not been created in the system
-        if not self.model.objects.filter(user=user, obj_id=pk).exists():
+def rmbookmark(request, pk):
+    # We need a user
+    user = auth.get_user(request)
+    # Trying to get a bookmark from the table
+    # need to check if the bookmark exists in the system already or not
+    if not URRestaurant.objects.filter(user=user, obj_id=pk).exists():
+        return JsonResponse({
+        'success': False, 
+        'err_code': 'Entry_not_existed', 
+    })
+    # if user has created an entry for note but not for bookmark
+    elif URRestaurant.objects.filter(user=user, obj_id=pk).exists():
+        if URRestaurant.objects.get(user=user, obj_id=pk).like == False:
             return JsonResponse({
-            'success': False, 
-            'err_code': 'Entry_not_existed', 
-        })
-    
-        # otherwise this is an existing restaurant that user would like to remove!
-        bookmark = self.model.objects.get(user=user, obj_id=pk)
-        bookmark.delete()
+        'success': False, 
+        'err_code': 'Entry_not_existed', 
+    })
 
-        return JsonResponse({
-            'success': True, 
-            'err_code': 'Pass', 
-        })
+    # otherwise this is an existing restaurant that user would like to remove!
+    ulike = URRestaurant.objects.get(user=user, obj_id=pk)
+    ulike.like = False
+    ulike.save()
+
+    return JsonResponse({
+        'success': True, 
+        'err_code': 'Pass', 
+    })
     
 # note system
 def addNote(request, pk):
-    if NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
-            return JsonResponse({
-            'success': False, 
-            'err_code': 'Note_existed', 
-        })
+    if URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+        if len(URRestaurant.objects.get(user=request.user, obj_id=pk).note) > 0 and URRestaurant.objects.get(user=request.user, obj_id=pk).note != 'None':
+                return JsonResponse({
+                'success': False, 
+                'err_code': 'Note_existed', 
+            })
     
     res = get_object_or_404(Restaurant, pk=pk)
-    form = NoteForm(request.POST or None)
-    if form.is_valid():
-        comment = form.save(commit=False)
-        u = request.user
-        comment.user = u
-        comment.obj = res
-        comment.save()
-        return redirect('my-fav-res')
+    if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+        form = NoteForm(request.POST or None)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            u = request.user
+            comment.user = u
+            comment.obj = res
+            comment.save()
+            return redirect('my-fav-res')
+    else:
+        record = URRestaurant.objects.get(user=request.user, obj_id=pk)
+        form = NoteForm(request.POST, instance=record)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.save()
+            return redirect('my-fav-res')            
     return render(request, 'notes.html', 
                               { 'form': form, 'restaurant':res, 'user':request.user })
     
 def updateNote(request, pk):
-    if not NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+    if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
             return JsonResponse({
             'success': False, 
             'err_code': 'Note_non_existed', 
         })
+    elif URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+        if URRestaurant.objects.get(user=request.user, obj_id=pk).note == 'None':
+                return JsonResponse({
+                'success': False, 
+                'err_code': 'Note_non_existed', 
+            })
     
     res = get_object_or_404(Restaurant, pk=pk)
-    existing_note = NoteRestaurant.objects.get(user=request.user, obj_id=pk)
+    existing_note = URRestaurant.objects.get(user=request.user, obj_id=pk)
     form = NoteForm(request.POST or None, instance=existing_note)
     if form.is_valid():
         comment = form.save(commit=False)
@@ -231,14 +244,21 @@ def updateNote(request, pk):
                               { 'form': form, 'restaurant':res, 'user':request.user })
     
 def deleteNote(request, pk):
-    if not NoteRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+    if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
             return JsonResponse({
             'success': False, 
             'err_code': 'Note_non_existed', 
         })
+    elif URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
+        if len(URRestaurant.objects.get(user=request.user, obj_id=pk).note) > 0 and URRestaurant.objects.get(user=request.user, obj_id=pk).note == 'None':
+                return JsonResponse({
+                'success': False, 
+                'err_code': 'Note_non_existed', 
+            })
     
-    existing_note = NoteRestaurant.objects.get(user=request.user, obj_id=pk)
-    existing_note.delete()
+    existing_note = URRestaurant.objects.get(user=request.user, obj_id=pk)
+    existing_note.note = "None"
+    existing_note.save()
     return JsonResponse({
         'success': True, 
         'err_code': 'Pass', 
@@ -265,22 +285,63 @@ def search_form(request):
     return render(request, 'searchf.html')
 
 def search2(request):
-    if 'q' in request.GET:
+    # if the search query is presented
+#    if 'q' in request.GET:
+#        query = request.GET.get('q')
+#        # if the city is also provided
+#    if 'qc' in request.GET:
+#        q_city = request.GET.get('qc')
+        
+    if request.GET.get('q') != "" and request.GET.get('qc') != "":
         query = request.GET.get('q')
-        if query:
-            query_list = query.split()
-            result = Restaurant.objects.filter(
-                reduce(operator.and_,
-                       (Q(name__icontains=q) for q in query_list)) |
-                reduce(operator.and_,
-                       (Q(address__icontains=q) for q in query_list)) |
-                reduce(operator.and_,
-                       (Q(city__icontains=q) for q in query_list)) 
-            )
-            paginator = Paginator(result, 15)
-            page = request.GET.get('page', 1)
-            result = paginator.page(page)
-            return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query})
+        q_city = request.GET.get('qc')
+        query_list = query.split()
+        ql2 = q_city.split()
+        result = Restaurant.objects.filter(
+            reduce(operator.and_,
+                   (Q(name__icontains=q) for q in query_list)) |
+            reduce(operator.and_,
+                   (Q(address__icontains=q) for q in query_list)) |
+            reduce(operator.and_,
+                       (Q(category__name__icontains=q) for q in query_list)) &
+            reduce(operator.and_,
+                   (Q(city__icontains=q_city) for q_city in ql2)) 
+        ).distinct()
+        paginator = Paginator(result, 15)
+        page = request.GET.get('page', 1)
+        result = paginator.page(page)
+        return render(request, 'results.html', {'results': result, 'query': '?q=%s&qc=%s' % (query, q_city)})
+    # query is presented but no city
+    elif request.GET.get('q') != "":
+        query = request.GET.get('q')
+        query_list = query.split()
+        result = Restaurant.objects.filter(
+            reduce(operator.and_,
+                   (Q(name__icontains=q) for q in query_list)) |
+            reduce(operator.and_,
+                   (Q(address__icontains=q) for q in query_list)) |
+            reduce(operator.and_,
+                   (Q(city__icontains=q) for q in query_list)) |
+            reduce(operator.and_,
+                       (Q(category__name__icontains=q) for q in query_list))
+        ).distinct()
+        paginator = Paginator(result, 15)
+        page = request.GET.get('page', 1)
+        result = paginator.page(page)
+        return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query})
+    # city is provided but no query
+    elif request.GET.get('qc') != "":   
+        q_city = request.GET.get('qc')
+        ql2 = q_city.split()
+        result = Restaurant.objects.filter(
+            reduce(operator.and_,
+                   (Q(city__icontains=q_city) for q_city in ql2)) 
+        ).distinct()
+        paginator = Paginator(result, 15)
+        page = request.GET.get('page', 1)
+        result = paginator.page(page)
+        return render(request, 'results.html', {'results': result, 'query': '?qc=%s' % q_city})
+      # nothing is supplied 
     else:
         message = 'You submitted an empty form.'
     return HttpResponse(message)
