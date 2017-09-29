@@ -1,17 +1,24 @@
 
 <html lang="en">
 <head>
+
+{% load bootstrap3 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
   
   {% block title %}<title>BCSH Foodie Guide</title>{% endblock %}
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   
+  <link href="http://getbootstrap.com/docs/4.0/examples/jumbotron/jumbotron.css" rel="stylesheet">
+
   <!-- Add additional CSS in static file -->
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">  
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"> 
   
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwyamDxQCDWiYgLxDKTewdRHYdVSsBhXk&callback=initMap">
@@ -47,35 +54,73 @@ $(function () {
 
 <body>
 
-  <div class="container-fluid">
+   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="#">BCSH Foodie</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'search' %}">Search</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'restaurant-random' %}">PICK A RESTAURANT FOR ME (ALL)!</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Details</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="{% url 'restaurants' %}">All Restaurants</a>
+              <a class="dropdown-item" href="{% url 'categories' %}">All Categories</a>
+            </div>
+			</ul>
+          </li>
+		  {% if user.is_authenticated %}
+		  <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="{% url 'my-fav-res' %}">My Restaurant Profile</a>
+              <a class="dropdown-item" href="{% url 'community' %}">Community Status</a>
+			  <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
+            </div>
+          </li>
+		  {% else %}
+		  <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Join Us!</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="{% url 'login'%}?next={{request.path}}">Log in</a>
+              <a class="dropdown-item" href="{% url 'user-signup' %}">Sign up</a>
+            </div>
+          </li>
+		  {% endif %}
+        
+
+      </div>
+    </nav>
+	
+  <div class="container">
 
     <div class="row">
-      <div class="col-sm-2">
-      {% block sidebar %}
-      <ul class="sidebar-nav">
-          <li><a href="{% url 'index' %}">Home</a></li>
-		  <li><a href="{% url 'search' %}">Search</a></li>
-          <li><a href="{% url 'restaurants' %}">All Restaurants</a></li>
-          <li><a href="{% url 'categories' %}">All Categories</a></li>
-		  <li><a href="{% url 'restaurant-random' %}">PICK A RESTAURANT FOR ME (ALL)!</a></li>
-		  </br>
-		  {% if user.is_authenticated %}
-			 <li>Username: {{ user.get_username }}</li>
-			 <li><a href="{% url 'my-fav-res' %}">My Restaurant Profile</a></li>
-			 <li><a href="{% url 'community' %}">Community Status</a></li>
-			 <li><a href="{% url 'logout'%}?next={{request.path}}">Logout</a></li>   
-		   {% else %}
-			 <li><a href="{% url 'login'%}?next={{request.path}}">Login</a></li>   
-			 <li><a href="{% url 'user-signup' %}">Sign up</a></li>
-		   {% endif %} 
-      </ul>
-     {% endblock %}
-      </div>
+      
       <div class="col-sm-10 ">
       {% block content %}{% endblock %}
       </div>
     </div>
 
   </div>
+  
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="../../../../assets/js/vendor/popper.min.js"></script>
+    <script src="../../../../dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../../../assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 </html>

@@ -1,8 +1,6 @@
 {% extends "base_generic.html" %}
 {% load bootstrap3 %}
 
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
 {% bootstrap_messages %}
 
@@ -61,7 +59,7 @@
 	{% endif %}
 	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addnote" title="Notes" style="float:left;">
 	{% buttons %}
-		<button type="submit" class="btn btn-primary">
+		<button type="submit" class="btn btn-primary" id="an">
 		{% bootstrap_icon "pencil" %} Add a note!
 		</button>
 	{% endbuttons %}
@@ -245,6 +243,7 @@ function delete_notes()
 $(function() {
     $('[data-action="addbookmark"]').click(to_bookmarks);
 	$('[data-action="rmbookmark"]').click(rm_bookmarks);
+	$('body').on('click', '#an',add_notes);
 	$('[data-action="addnote"]').click(add_notes);
 	$('[data-action="updatenote"]').click(update_notes);
 	$('[data-action="deletenote"]').click(delete_notes);
