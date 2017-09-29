@@ -2,13 +2,15 @@
 {% load bootstrap3 %}
 {% block content %}
 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
 
 {% bootstrap_messages %}
 
     <h1>Search</h1>
 	<p>Type your search term here:</p>
     <form action="/search/" method="get">
-        <input type="text" name="q">
+        <input type="text" name="q" required='required'>
 		</br></br>
 		{% buttons %}
 		<button type="submit" class="btn btn-primary">
