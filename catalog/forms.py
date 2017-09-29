@@ -31,7 +31,7 @@ class NoteForm(forms.ModelForm):
         return data
     
     class Meta:
-        model = NoteRestaurant
+        model = URRestaurant
         fields = ('note', )
 
 class SearchForm(forms.ModelForm):

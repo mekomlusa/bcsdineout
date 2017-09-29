@@ -44,10 +44,10 @@ urlpatterns = [
 #app_name = 'ajax'
 urlpatterns += [
     url(r'^restaurant/(?P<pk>[-\w ]+)/addbookmark/$',
-        login_required(views.AddBookmarkView.as_view(model=BookmarkRestaurant)),
+        login_required(views.bmpost),
         name='restaurant_bookmark'),
     url(r'^restaurant/(?P<pk>[-\w ]+)/rmbookmark/$',
-        login_required(views.RmBookmarkView.as_view(model=BookmarkRestaurant)),
+        login_required(views.rmbookmark),
         name='rm_restaurant_bookmark'),
     url(r'^restaurant/(?P<pk>[-\w ]+)/addnote/$',
         login_required(views.addNote), name='restaurant_note'),

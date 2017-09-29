@@ -4,34 +4,35 @@
     <h1>Community Activities</h1>
 	<h2>See how other users are exploring new restaurants!</h2>
 
-{% if bookmarkrestaurant_list %}
+{% if urrestaurant_list %}
     <ul>
 
-      {% for br in bookmarkrestaurant_list %} 
+      {% for br in urrestaurant_list %} 
+	  {% if br.like == True %}
       <li>
         {{ br.user.username }} favorited this restaurant: <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
       </li>
-      {% endfor %}
     </ul>
+	{% endif %}
+	{% endfor %}
 
     {% else %}
-      <p>Nobody has favorited any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</a></p>
+      <p>Nobody else has favorited any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</a></p>
     {% endif %}
 
-{% if notes %}
-    <ul>
-
-      {% for nr in notes %} 
-	  
+{% if urrestaurant_list %}
+<ul>
+      {% for nr in urrestaurant_list %} 
+	  {% if nr.note != 'None' %}
       <li>
         {{ nr.user.username }} added a note to this restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
       </li>
-	  
-      {% endfor %}
-    </ul>
+	</ul>
+	 {% endif %} 
+	 {% endfor %}
 
     {% else %}
-      <p>Nobody has added a note any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</p>
-    {% endif %} 
+      <p>Nobody else has added a note any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</p>
+	{% endif %}
 	
 {% endblock %}

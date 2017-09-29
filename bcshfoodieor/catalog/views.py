@@ -80,7 +80,7 @@ class RestaurantDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(RestaurantDetailView, self).get_context_data(**kwargs)
         if self.request.user.is_authenticated:
-            queryset2 = NoteRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
+            queryset2 = URRestaurant.objects.filter(user_id=self.request.user,obj_id=self.kwargs.get("stub"))
             context['notes'] = queryset2
         return context
     
@@ -181,7 +181,11 @@ def rmbookmark(request, pk):
     # otherwise this is an existing restaurant that user would like to remove!
     ulike = URRestaurant.objects.get(user=user, obj_id=pk)
     ulike.like = False
-    ulike.save()
+    # check to see if there is a need to remove the record
+    if ulike.note != "None":
+        ulike.save()
+    else:
+        ulike.delete()
 
     return JsonResponse({
         'success': True, 
@@ -258,7 +262,11 @@ def deleteNote(request, pk):
     
     existing_note = URRestaurant.objects.get(user=request.user, obj_id=pk)
     existing_note.note = "None"
-    existing_note.save()
+    # check to see if there is a need to remove the record
+    if existing_note.like == True:
+        existing_note.save()
+    else:
+        existing_note.delete()
     return JsonResponse({
         'success': True, 
         'err_code': 'Pass', 
@@ -268,80 +276,35 @@ class CommunityView(LoginRequiredMixin,generic.ListView):
     """
     Generic class-based view listing restaurants favorited by current user. 
     """
-    model = BookmarkRestaurant, NoteRestaurant
+    model = URRestaurant
     template_name ='community.html'
     paginate_by = 25
     
     def get_queryset(self):
          return BookmarkRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
-    
-    def get_context_data(self, **kwargs):
-        context =  super(CommunityView, self).get_context_data(**kwargs)
-        queryset2 = NoteRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
-        context['notes'] = queryset2
-        return context
        
 def search_form(request):
     return render(request, 'searchf.html')
 
 def search2(request):
-    # if the search query is presented
-#    if 'q' in request.GET:
-#        query = request.GET.get('q')
-#        # if the city is also provided
-#    if 'qc' in request.GET:
-#        q_city = request.GET.get('qc')
-        
-    if request.GET.get('q') != "" and request.GET.get('qc') != "":
+    if 'q' in request.GET:
         query = request.GET.get('q')
-        q_city = request.GET.get('qc')
-        query_list = query.split()
-        ql2 = q_city.split()
-        result = Restaurant.objects.filter(
-            reduce(operator.and_,
-                   (Q(name__icontains=q) for q in query_list)) |
-            reduce(operator.and_,
-                   (Q(address__icontains=q) for q in query_list)) |
-            reduce(operator.and_,
-                       (Q(category__name__icontains=q) for q in query_list)) &
-            reduce(operator.and_,
-                   (Q(city__icontains=q_city) for q_city in ql2)) 
-        ).distinct()
-        paginator = Paginator(result, 15)
-        page = request.GET.get('page', 1)
-        result = paginator.page(page)
-        return render(request, 'results.html', {'results': result, 'query': '?q=%s&qc=%s' % (query, q_city)})
-    # query is presented but no city
-    elif request.GET.get('q') != "":
-        query = request.GET.get('q')
-        query_list = query.split()
-        result = Restaurant.objects.filter(
-            reduce(operator.and_,
-                   (Q(name__icontains=q) for q in query_list)) |
-            reduce(operator.and_,
-                   (Q(address__icontains=q) for q in query_list)) |
-            reduce(operator.and_,
-                   (Q(city__icontains=q) for q in query_list)) |
-            reduce(operator.and_,
+        if query:
+            query_list = query.split()
+            result = Restaurant.objects.filter(
+                reduce(operator.and_,
+                       (Q(name__icontains=q) for q in query_list)) |
+                reduce(operator.and_,
+                       (Q(address__icontains=q) for q in query_list)) |
+                reduce(operator.and_,
+                       (Q(city__icontains=q) for q in query_list)) |
+                reduce(operator.and_,
                        (Q(category__name__icontains=q) for q in query_list))
-        ).distinct()
-        paginator = Paginator(result, 15)
-        page = request.GET.get('page', 1)
-        result = paginator.page(page)
-        return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query})
-    # city is provided but no query
-    elif request.GET.get('qc') != "":   
-        q_city = request.GET.get('qc')
-        ql2 = q_city.split()
-        result = Restaurant.objects.filter(
-            reduce(operator.and_,
-                   (Q(city__icontains=q_city) for q_city in ql2)) 
-        ).distinct()
-        paginator = Paginator(result, 15)
-        page = request.GET.get('page', 1)
-        result = paginator.page(page)
-        return render(request, 'results.html', {'results': result, 'query': '?qc=%s' % q_city})
-      # nothing is supplied 
+            ).distinct()
+            paginator = Paginator(result, 15)
+            page = request.GET.get('page', 1)
+            result = paginator.page(page)
+            return render(request, 'results.html', {'results': result, 'query': '?q=%s' % query, 'term': query})
     else:
         message = 'You submitted an empty form.'
     return HttpResponse(message)
