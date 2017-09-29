@@ -282,7 +282,7 @@ class CommunityView(LoginRequiredMixin,generic.ListView):
     paginate_by = 25
     
     def get_queryset(self):
-         return BookmarkRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
+         return URRestaurant.objects.filter(~Q(user_id=self.request.user)).order_by('id')
 
        
 def search_form(request):
