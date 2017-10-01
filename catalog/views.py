@@ -86,7 +86,7 @@ class RestaurantDetailView(generic.DetailView):
     
 class RestaurantRandomView(generic.DetailView):
     model = Restaurant
-    template_name = 'restaurant_detail.html'
+    template_name = 'restaurant_detail_rand.html'
     def get_object(self):
         count = Restaurant.objects.all().count()
         rand = random.randint(0,count)

@@ -1,0 +1,288 @@
+{% extends "base_generic.html" %}
+{% load bootstrap3 %}
+
+
+{% bootstrap_messages %}
+
+{% block content %}
+</br></br>
+  <h1>Restaurant Name: {{ restaurant.name }}</h1>
+
+	<img style = "float:right; margin:0px 0px 100px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
+
+  <div id="map" style="width: 304px; height: 300px; clear: both; float: right; text-align: left;";></div>
+
+  <br/>
+  <li><strong>Address:</strong> {{ restaurant.address}}</li>
+  <li><strong>City:</strong> {{ restaurant.city }}</li>
+  <li><strong>State:</strong> {{ restaurant.state }} </li>
+  <li><strong>Zipcode:</strong> {{ restaurant.zipcode }}</li>
+  <li><strong>Phone:</strong> {{ restaurant.phone }}</li>
+  <li><strong>Price Range:</strong> {{ restaurant.price }}</li>  
+  <li><strong>Yelp link:</strong> <a href="{{ restaurant.yelp_url }}" target="_blank">{{ restaurant.name }} on Yelp</a></li>
+  <li><strong>Category:</strong> {% for c in restaurant.category_set.all %} <a href="{{ c.get_absolute_url }}">{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</a></li>
+  <li><strong>Hours of Operations: </strong>
+  <div style="width: 200px">{% if restaurant.hour %}{{ restaurant.hour.hoursOfOpearation }}{% else %}No hour data is available.{% endif %}
+  </div></li>
+  <li><strong>Yelp Reviews:</strong></li>
+  <div style="width: 600px">
+  <ul style="list-style-type:square">{% if restaurant.yelpreview_set.all %}{% for rv in restaurant.yelpreview_set.all %} 
+  <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
+  <br/>
+
+    
+  
+  
+ 
+	{% if user.is_authenticated %}
+  	<div id="addbookmark" data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+		{% bootstrap_icon "star" %} Add to Fav
+		</button>
+	{% endbuttons %}
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="rmbookmark" title="Favorites" style="float:left;">
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+		{% bootstrap_icon "star-empty" %} Remove from Fav
+		</button>
+	{% endbuttons %}
+	</div>
+	
+	</br></br>
+	{% if notes %}
+	{% for n in notes %}
+	<p>My note for this restaurant: {{ n.note }}</p>
+	{% endfor %}
+	{% else %}
+	<p>No note for this restaurant yet.</p>
+	{% endif %}
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addnote" title="Notes" style="float:left;">
+	{% buttons %}
+		<button type="submit" class="btn btn-primary" id="an">
+		{% bootstrap_icon "pencil" %} Add a note!
+		</button>
+	{% endbuttons %}
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="updatenote" title="Notes" style="float:left;">
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+		{% bootstrap_icon "edit" %} Update the note
+		</button>
+	{% endbuttons %}
+	</div>
+	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="deletenote" title="Notes" style="float:left;">
+	{% buttons %}
+		<button type="submit" class="btn btn-primary">
+		{% bootstrap_icon "remove" %} Delete the note
+		</button>
+	{% endbuttons %}
+	</div>
+	{% else %}
+	<p><a href="{% url 'login'%}?next={{request.path}}">Login</a> or <a href="{% url 'user-signup' %}">register</a> to <strong>favorite</strong> or <strong>add a note</strong> to this restaurant!</p>
+	{% endif %}
+	
+	</br></br>
+	<form action={% url 'restaurant-random' %}>
+  {% buttons %}
+		<button type="submit" class="btn btn-primary" value="PICK A RESTAURANT FOR ME PLEASE!!!" />
+		{% bootstrap_icon "thumbs-down" %} I don't like this restaurant, gimme another one
+		</button>
+	{% endbuttons %}
+	</form>
+  
+
+<script type="text/javascript">
+function to_bookmarks()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+
+    $.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+        data : { 'obj' : pk },
+		
+		success : function (json) {
+			if(json.err_code === 'Pass'){
+			current.find("[data-count='" + action + "']").text(json.count);
+			alert('Added to your favorite list!');
+			}
+		else if (json.err_code === 'Entry_existed'){
+               alert('ERROR! You have already favorited this restaurant.');
+            }
+		}
+
+
+});
+
+	//var div = document.getElementById('addbookmark');
+    //if (div.style.display !== 'none') {
+    //    div.style.display = 'none';
+    //}
+    //else {
+    //    div.style.display = 'block';
+    //}
+
+
+	
+
+    return false;
+}
+
+
+function rm_bookmarks()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+
+    $.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+        data : { 'obj' : pk },
+
+        success : function (json) {
+			if(json.err_code === 'Pass'){
+			current.find("[data-count='" + action + "']").text(json.count);
+			alert('Removed from your favorite list!');
+			}
+		else if (json.err_code === 'Entry_not_existed'){
+               alert('ERROR! You have not favorited this restaurant yet.');
+            }
+		}
+
+    });
+	
+
+    return false;
+}
+
+function add_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Note_existed'){
+			alert('ERROR! You have already written a note for this restaurant.');
+			window.location = "/catalog/myfavres";
+			}
+			else{
+			var url = "/catalog/" + type + "/" + pk + "/" + action;
+			window.location = url;
+			}
+		}
+
+    });
+	
+	
+
+    return false;
+}
+
+function update_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Note_non_existed'){
+			alert('ERROR! You do not have a note for this restaurant yet.');
+			var url = "/catalog/" + type + "/" + pk + "/addnote/";
+			window.location = url;
+			}
+			else{
+			var url = "/catalog/" + type + "/" + pk + "/" + action;
+			window.location = url;
+			}
+		}
+
+    });
+	
+	
+
+    return false;
+}
+
+function delete_notes()
+{
+    var current = $(this);
+    var type = current.data('type');
+    var pk = current.data('id');
+    var action = current.data('action');
+	
+	$.ajax({
+        url : "/catalog/" + type + "/" + pk + "/" + action + "/",
+        type : 'POST',
+
+        success : function (json) {
+			if(json.err_code === 'Pass'){
+			alert('Note has been successfully removed!');
+			window.location.reload();
+			}
+		else if (json.err_code === 'Note_non_existed'){
+               alert('ERROR! You do not have a note for this restaurant yet.');
+            }
+		}
+
+    });
+	
+	
+
+    return false;
+}
+
+
+$(function() {
+    $('[data-action="addbookmark"]').click(to_bookmarks);
+	$('[data-action="rmbookmark"]').click(rm_bookmarks);
+	$('[data-action="addnote"]').click(add_notes);
+	$('[data-action="updatenote"]').click(update_notes);
+	$('[data-action="deletenote"]').click(delete_notes);
+});
+
+function initMap() {
+        var rl = {lat: parseFloat("{{ restaurant.latitude }}"), lng: parseFloat("{{ restaurant.longtitude }}")};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: rl
+        });
+
+        var contentString = "{{ restaurant.name }}</br> Link: <a href=\"{{ restaurant.yelp_url }}\" target=\"_blank\">{{ restaurant.name }} on Yelp</a>";
+
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+        var marker = new google.maps.Marker({
+          position: rl,
+          map: map,
+          title: "{{ restaurant.name }}"
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      }
+	  
+	  google.maps.event.addDomListener(window, "load", initMap);
+
+</script>
+
+{% endblock %}
