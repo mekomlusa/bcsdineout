@@ -4,8 +4,21 @@
     list-style: none;
 }
 
-
 * {
    font-size: 16px;
    line-height: 1.428;
+}
+
+.dropdown-menu a{
+    color: #808080 !important;
+}
+
+.container {
+padding: 0px;
+}
+
+.nav.navbar {
+width: inherit;
+left: 50%;
+transform: translateX(-50%);
 }
