@@ -1,14 +1,16 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+</br></br>
     <h1>Community Activities</h1>
 	<h2>See how other users are exploring new restaurants!</h2>
+	</br>
 
 {% if urrestaurant_list %}
-    <ul>
 
       {% for br in urrestaurant_list %} 
 	  {% if br.like == True %}
+	 <ul>
       <li>
         {{ br.user.username }} favorited this restaurant: <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
       </li>
@@ -19,11 +21,12 @@
     {% else %}
       <p>Nobody else has favorited any restaurant yet! <a href="{% url 'restaurant-random' %}"> Why not you to be the first one??</a></p>
     {% endif %}
-
+</br>
+	
 {% if urrestaurant_list %}
-<ul>
       {% for nr in urrestaurant_list %} 
 	  {% if nr.note != 'None' %}
+	  <ul>
       <li>
         {{ nr.user.username }} added a note to this restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
       </li>

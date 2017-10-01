@@ -1,6 +1,8 @@
 {% extends "base_generic.html" %}
+{% load bootstrap3 %}
 
 {% block content %}
+</br></br>
 <h1>BCSH Foodie Home</h1>
 
   <p>Welcome to <em>BCSH Foodie Guide</em>, a very basic site that can help you navigate restaurants around the BCSH area.</p>
@@ -8,9 +10,14 @@
   <p>The dataset is last updated in September 2017.</p>
 
   <a href="/"><img src="https://image.ibb.co/iH7VB5/636201892575795318_861220656_food.jpg" alt="Food" style="width:304px;height:228px;"></a>
-  </br>
+  </br> </br>
+  
   <form action={% url 'restaurant-random' %}>
-    <input type="submit" value="PICK A RESTAURANT FOR ME PLEASE!!!" />
+  {% buttons %}
+		<button type="submit" class="btn btn-primary" value="PICK A RESTAURANT FOR ME PLEASE!!!" />
+		{% bootstrap_icon "thumbs-up" %} PICK A RESTAURANT FOR ME PLEASE!!!
+		</button>
+	{% endbuttons %}
 	</form>
   
 <h2>Dynamic counts</h2>

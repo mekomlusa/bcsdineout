@@ -1,7 +1,9 @@
 {% extends "base_generic.html" %}
 {% block content %}
-
-    <h1>Note for restaurant: {{ restaurant.name }}</h1>
+{% load bootstrap3 %}
+	
+	</br></br>
+    <h1>Note for restaurant: <a href="{{ restaurant.get_absolute_url }}">{{ restaurant.name }}</a></h1>
     <p>Commentor: {{ user.username }}</p>
     
     <form action="" method="post">
@@ -10,7 +12,12 @@
         {{ form }}
         </table>
 		</br>
-        <input type="submit" value="Submit" />
+		{% buttons %}
+		<button type="submit" class="btn btn-primary" value="Submit" />
+		{% bootstrap_icon "ok" %} Submit
+		</button>
+		{% endbuttons %}
+        <!-- input type="submit" value="Submit" /> -->
     </form>
 
 {% endblock %}

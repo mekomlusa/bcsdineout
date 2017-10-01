@@ -1,38 +1,40 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+</br></br>
     <h1>Restaurants Favorited</h1>
-
+</br>
 {% if urrestaurant_list %}
-    <ul>
 
       {% for br in urrestaurant_list %} 
 	  {% if br.user_id == user.id and br.like == True %}
+	  <ul>
       <li>
         <a href="{{ br.obj.get_absolute_url }}">{{br.obj.name}}</a>     
       </li>
+	  </ul>
 	  {% endif %}
       {% endfor %}
-    </ul>
 
     {% else %}
       <p>There is no restaurant favorited.</p>
     {% endif %}
+	</br>
 
 	<h1>Notes Added</h1>
-
+</br>
     {% if urrestaurant_list %}
-    <ul>
 
       {% for nr in urrestaurant_list %} 
 	  {% if nr.user_id == user.id and nr.note != 'None' %}
+	  <ul>
 	  
       <li>
         Note for restaurant <a href="{{ nr.obj.get_absolute_url }}">{{ nr.obj.name }}</a>: {{ nr.note }}     
       </li>
+	  </ul>
 	   {% endif %}
       {% endfor %}
-    </ul>
 
     {% else %}
       <p>There is no note for any restaurant.</p>

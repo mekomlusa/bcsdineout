@@ -1,19 +1,18 @@
 {% extends "base_generic.html" %}
 {% load bootstrap3 %}
 
-{% bootstrap_css %}
-{% bootstrap_javascript %}
 
 {% bootstrap_messages %}
 
 {% block content %}
+</br></br>
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
 
 	<img style = "float:right; margin:0px 0px 100px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
 
-   <div id="map" style="width: 304px; height: 300px; clear: both; float: right; text-align: left;";></div>
+  <div id="map" style="width: 304px; height: 300px; clear: both; float: right; text-align: left;";></div>
 
-  
+  <br/>
   <li><strong>Address:</strong> {{ restaurant.address}}</li>
   <li><strong>City:</strong> {{ restaurant.city }}</li>
   <li><strong>State:</strong> {{ restaurant.state }} </li>
@@ -23,17 +22,20 @@
   <li><strong>Yelp link:</strong> <a href="{{ restaurant.yelp_url }}" target="_blank">{{ restaurant.name }} on Yelp</a></li>
   <li><strong>Category:</strong> {% for c in restaurant.category_set.all %} <a href="{{ c.get_absolute_url }}">{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</a></li>
   <li><strong>Hours of Operations: </strong>
-  <div style="width: 180px">{% if restaurant.hour %}{{ restaurant.hour.hoursOfOpearation }}{% else %}No hour data is available.{% endif %}
+  <div style="width: 200px">{% if restaurant.hour %}{{ restaurant.hour.hoursOfOpearation }}{% else %}No hour data is available.{% endif %}
   </div></li>
   <li><strong>Yelp Reviews:</strong></li>
-  <div style="width: 700px">
+  <div style="width: 600px">
   <ul style="list-style-type:square">{% if restaurant.yelpreview_set.all %}{% for rv in restaurant.yelpreview_set.all %} 
   <li><a href="{{ rv.get_url }}" target="_blank">{{ rv.reviewtext }}</a></li>{% if not forloop.last %}{% endif %}{% endfor %}{% else %} No review is available.{% endif%}</ul>
   <br/>
+
+    
   
-  </div>
+  
+ 
 	{% if user.is_authenticated %}
-  	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
+  	<div id="addbookmark" data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
 	{% buttons %}
 		<button type="submit" class="btn btn-primary">
 		{% bootstrap_icon "star" %} Add to Fav
@@ -48,7 +50,7 @@
 	{% endbuttons %}
 	</div>
 	
-	</br></br></br>
+	</br></br>
 	{% if notes %}
 	{% for n in notes %}
 	<p>My note for this restaurant: {{ n.note }}</p>
@@ -58,7 +60,7 @@
 	{% endif %}
 	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addnote" title="Notes" style="float:left;">
 	{% buttons %}
-		<button type="submit" class="btn btn-primary">
+		<button type="submit" class="btn btn-primary" id="an">
 		{% bootstrap_icon "pencil" %} Add a note!
 		</button>
 	{% endbuttons %}
@@ -105,8 +107,18 @@ function to_bookmarks()
             }
 		}
 
-		
-    });
+
+});
+
+	//var div = document.getElementById('addbookmark');
+    //if (div.style.display !== 'none') {
+    //    div.style.display = 'none';
+    //}
+    //else {
+    //    div.style.display = 'block';
+    //}
+
+
 	
 
     return false;

@@ -2,8 +2,10 @@
 {% load bootstrap3 %}
 {% block content %}
 
+</br></br>
 <h1>Search Results</h1>
 <p>Search term: {{ term }}</p>
+</br>
 
 {% if results %}
   {% for r in results %}
@@ -20,5 +22,6 @@
 {% endif %}
 <br/>
 <a href="{% url 'search' %}">Start a new search</a>
+
 
 {% endblock %}

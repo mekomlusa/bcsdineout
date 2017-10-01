@@ -79,23 +79,26 @@ $(function () {
             </div>
 			</ul>
           </li>
+		  
+		  <ul class="navbar-nav">
 		  {% if user.is_authenticated %}
 		  <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="{% url 'my-fav-res' %}">My Restaurant Profile</a>
-              <a class="dropdown-item" href="{% url 'community' %}">Community Status</a>
+            <a class="nav-link dropdown-toggle" href="" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown02">
+              <a class="dropdown-item" href="{% url 'my-fav-res' %}" style="word-wrap: break-word; white-space: normal;">My Restaurant Profile</a>
+              <a class="dropdown-item" href="{% url 'community' %}" style="word-wrap: break-word; white-space: normal;">Community Status</a>
 			  <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
             </div>
           </li>
 		  {% else %}
 		  <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Join Us!</a>
+            <a class="nav-link dropdown-toggle" href="" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Join Us!</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
               <a class="dropdown-item" href="{% url 'login'%}?next={{request.path}}">Log in</a>
               <a class="dropdown-item" href="{% url 'user-signup' %}">Sign up</a>
             </div>
           </li>
+		  </ul>
 		  {% endif %}
         
 
@@ -110,17 +113,14 @@ $(function () {
       {% block content %}{% endblock %}
       </div>
     </div>
+	
+	<hr>
+
+      <footer>
+        <p>&copy; BCSH Foodie Guide 2017</p>
+      </footer>
 
   </div>
   
-  <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="../../../../assets/js/vendor/popper.min.js"></script>
-    <script src="../../../../dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../../../assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 </html>
