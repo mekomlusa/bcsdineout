@@ -84,9 +84,10 @@ $(function () {
 		  {% if user.is_authenticated %}
 		  <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown02">
-              <a class="dropdown-item" href="{% url 'my-fav-res' %}" style="word-wrap: break-word; white-space: normal;">My Restaurant Profile</a>
-              <a class="dropdown-item" href="{% url 'community' %}" style="word-wrap: break-word; white-space: normal;">Community Status</a>
+            <div class="dropdown-menu pull-right" aria-labelledby="dropdown02">
+              <a class="dropdown-item" href="{% url 'my-fav-res' %}">My Restaurant Profile</a>
+              <a class="dropdown-item" href="{% url 'community' %}">Community Status</a>
+			  <a class="dropdown-item" href="{% url 'password_reset' %}">Reset Password</a>
 			  <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
             </div>
           </li>
