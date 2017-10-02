@@ -5,7 +5,7 @@
 {% bootstrap_messages %}
 
 {% block content %}
-</br></br></br></br>
+</br></br>
   <h1>Restaurant Name: {{ restaurant.name }}</h1>
 
 	<img style = "float:right; margin:0px 0px 100px 0px; padding-right:0px; width:304px;height:228px" src= {{ restaurant.image_url }} alt="Restaurant Pic" onError="if (this.src != 'https://image.ibb.co/jkUNr5/404.jpg') src='https://image.ibb.co/jkUNr5/404.jpg';">
@@ -38,8 +38,7 @@
   	<div id="addbookmark" data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="addbookmark" title="Favorites" style="float:left;">
 	{% buttons %}
 		<button type="submit" class="btn btn-primary">
-		{% bootstrap_icon "star" %} Add to Fav
-		</button>
+		{% bootstrap_icon "star" %}Add to Fav</button>
 	{% endbuttons %}
 	</div>
 	<div data-id= "{{ restaurant.res_id }}" data-type="restaurant" data-action="rmbookmark" title="Favorites" style="float:left;">
@@ -53,7 +52,11 @@
 	</br></br>
 	{% if notes %}
 	{% for n in notes %}
+	{% if n.note != 'None' %}
 	<p>My note for this restaurant: {{ n.note }}</p>
+	{% else %}
+	<p>No note for this restaurant yet.</p>
+	{% endif %}
 	{% endfor %}
 	{% else %}
 	<p>No note for this restaurant yet.</p>

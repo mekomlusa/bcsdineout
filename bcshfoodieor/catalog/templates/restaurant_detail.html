@@ -53,7 +53,11 @@
 	</br></br>
 	{% if notes %}
 	{% for n in notes %}
+	{% if n.note != 'None' %}
 	<p>My note for this restaurant: {{ n.note }}</p>
+	{% else %}
+	<p>No note for this restaurant yet.</p>
+	{% endif %}
 	{% endfor %}
 	{% else %}
 	<p>No note for this restaurant yet.</p>
