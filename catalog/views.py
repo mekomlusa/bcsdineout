@@ -26,7 +26,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from django.contrib.auth.models import User
 
-from . forms import SignUpForm, NoteForm, SearchForm
+from . forms import SignUpForm, NoteForm
 
 from django.contrib.auth import login, authenticate
 
