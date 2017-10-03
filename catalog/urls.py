@@ -2,7 +2,6 @@ from django.conf.urls import url
 from django.contrib import admin
 from catalog import views
 
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
@@ -14,12 +13,13 @@ urlpatterns += [
     url(r'^catalog/', include('catalog.urls')),
 ]
 
-#Add URL maps to redirect the base URL to our application
+#Add URL maps to redirect the base URL to the application
 from django.views.generic import RedirectView
 urlpatterns += [
     url(r'^$', RedirectView.as_view(url='/catalog/', permanent=True)),
 ]
 
+# Basic URL matching patterns for most of the pages.
 from django.conf.urls import url
 
 from catalog import views
@@ -42,6 +42,7 @@ urlpatterns = [
 ]
 
 #app_name = 'ajax'
+# URL patterns below are only available for registered users.
 urlpatterns += [
     url(r'^restaurant/(?P<pk>[-\w ]+)/addbookmark/$',
         login_required(views.bmpost),

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from django.urls import reverse #Used to generate URLs by reversing the URL patterns
+from django.urls import reverse
 
 from django.db.models.aggregates import Count
 
@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 
 class Restaurant(models.Model):
     """
-    Model representing a restaurant (but not a specific instance of a restaurant).
+    Model representing a restaurant.
     """
     res_id = models.TextField(max_length=100, help_text="Unique ID for the restaurant",default="NULL",primary_key=True)
     name = models.CharField(max_length=200)
@@ -74,7 +74,7 @@ class Category(models.Model):
       
 def formattedHours(string):
     """
-    Return formatted hours.
+    Return formatted hours. This is not part of the Category model.
     """
     if string != '':
         return str(datetime.strptime(string, '%H%M').time())[:-3]
@@ -149,7 +149,7 @@ class YelpReview(models.Model):
         """
         return '%s' % (self.review_url)
 
-# bookmark system
+# bookmark system - discontinued as of 9/28
 class BookmarkBase(models.Model):
     class Meta:
         abstract = True
@@ -168,7 +168,7 @@ class BookmarkRestaurant(BookmarkBase):
     def get_bookmark_count(self):
         return self.bookmarkrestaurant_set().all().count()
     
-# Note system
+# Note system - discontinued as of 9/28
 class NoteBase(models.Model):
     class Meta:
         abstract = True
@@ -187,7 +187,8 @@ class NoteRestaurant(NoteBase):
     
     def get_notes_count(self):
         return self.noterestaurant_set().all().count()
-# combined system
+    
+# A note-restaurant combined system currently deployed in PROD.
 class URBase(models.Model):
     class Meta:
         abstract = True

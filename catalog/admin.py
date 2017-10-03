@@ -5,16 +5,16 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Category, Restaurant, Hour, YelpReview
+from .models import Category, Restaurant, Hour, YelpReview, URRestaurant
 
 admin.site.register(Category)
 admin.site.register(Restaurant)
 admin.site.register(Hour)
 admin.site.register(YelpReview)
+admin.site.register(URRestaurant)
 
 class RestaurantAdmin(admin.ModelAdmin):
     list_display = ('res_id', 'name', 'yelp_url', 'favby')
-    #list_filter = ('status', 'due_back')
     
     fieldsets = (
         ('Favorited', {

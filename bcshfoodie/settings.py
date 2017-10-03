@@ -83,7 +83,6 @@ WSGI_APPLICATION = 'bcshfoodie.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-# RL 9/12: this needs to be updated once psql info is available on heroku
 DATABASES = {
 
 }

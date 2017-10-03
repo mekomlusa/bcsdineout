@@ -52,7 +52,6 @@ def index(request):
     # Available restaurant in BCS area
     num_bcs_res=Restaurant.objects.filter(city__in=['College Station','Bryan']).count()
     num_yelp_review=YelpReview.objects.count()
-    # todo: add list of user signed up for the site and user-generated comments.
     # Number of visits to this view, as counted in the session variable.
     num_visits=request.session.get('num_visits', 0)
     request.session['num_visits'] = num_visits+1
@@ -65,6 +64,9 @@ def index(request):
     )
     
 class RestaurantListView(generic.ListView):
+    """
+    View function to display all restaurants on file.
+    """
     model = Restaurant
     context_object_name = 'restaurant_list'   # your own name for the list as a template variable
     queryset = Restaurant.objects.all() # Get all restaurants in the database
@@ -72,6 +74,9 @@ class RestaurantListView(generic.ListView):
     paginate_by = 25 # 25 results per page
     
 class RestaurantDetailView(generic.DetailView):
+    """
+    View function to display specific details of a restaurant instance.
+    """
     model = Restaurant
     template_name = 'restaurant_detail.html'
     def get_object(self):
@@ -85,7 +90,11 @@ class RestaurantDetailView(generic.DetailView):
         return context
     
 class RestaurantRandomView(generic.DetailView):
+    """
+    View function for the random restaurant picker.
+    """
     model = Restaurant
+    # the template is essentially the same as the restaurant detail page but with a shuffle button
     template_name = 'restaurant_detail_rand.html'
     def get_object(self):
         count = Restaurant.objects.all().count()
@@ -93,6 +102,9 @@ class RestaurantRandomView(generic.DetailView):
         return Restaurant.objects.all()[rand]
     
 class CategoryListView(generic.ListView):
+    """
+    View function to display all categories on file.
+    """
     model = Category
     context_object_name = 'category_list'   # your own name for the list as a template variable
     queryset = Category.objects.all().distinct('name')# Get all distinct categories in the database
@@ -100,6 +112,9 @@ class CategoryListView(generic.ListView):
     paginate_by = 25 # 25 results per page
         
 class CategoryList2View(generic.ListView):
+   """
+   Display a list of restaurants that belong to a specific category.
+   """
    model = Category
    context_object_name = "crlist"
    template_name = 'category_detail.html'  # Specify your own template name/location
@@ -137,23 +152,25 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 # fav system
-# link: https://evileg.com/en/post/244/
+# reference link: https://evileg.com/en/post/244/
+# rewritten 9/28 to accomdate the new user-restaurant syste,
 def bmpost(request, pk):
-    # We need a user
+    # Get user information
     user = auth.get_user(request)
     # Trying to get a bookmark from the table, or create a new one
-    # if the bookmark instance has already been created in the system and user has already liked it
+    # if the bookmark instance has already been created in the system and user has already liked it, abort the action
     if URRestaurant.objects.filter(user=user, obj_id=pk).exists():
         if URRestaurant.objects.get(user=user, obj_id=pk).like == True:
             return JsonResponse({
             'success': False, 
             'err_code': 'Entry_existed', 
             })
+        # else mark the restaurant as favorited by the user
         ulike = URRestaurant.objects.get(user=user, obj_id=pk)
         ulike.like = True
         ulike.save()
     else:
-        # otherwise this is a new restaurant that user would like to bookmark!
+        # this is a new restaurant that user would like to bookmark!
         URRestaurant.objects.create(user=user, obj_id=pk, like=True)
 
     return JsonResponse({
@@ -162,7 +179,7 @@ def bmpost(request, pk):
     })
     
 def rmbookmark(request, pk):
-    # We need a user
+    # Get user information
     user = auth.get_user(request)
     # Trying to get a bookmark from the table
     # need to check if the bookmark exists in the system already or not
@@ -195,6 +212,7 @@ def rmbookmark(request, pk):
     
 # note system
 def addNote(request, pk):
+    # check to see if there is already a note existed in the system
     if URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
         if len(URRestaurant.objects.get(user=request.user, obj_id=pk).note) > 0 and URRestaurant.objects.get(user=request.user, obj_id=pk).note != 'None':
                 return JsonResponse({
@@ -203,6 +221,7 @@ def addNote(request, pk):
             })
     
     res = get_object_or_404(Restaurant, pk=pk)
+    # user has never added a note to this restaurant nor favorited it. This will be a brand new record.
     if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
         form = NoteForm(request.POST or None)
         if form.is_valid():
@@ -213,6 +232,7 @@ def addNote(request, pk):
             comment.save()
             return redirect('my-fav-res')
     else:
+        # somehow user has some operations on this restaurant before
         record = URRestaurant.objects.get(user=request.user, obj_id=pk)
         form = NoteForm(request.POST, instance=record)
         if form.is_valid():
@@ -223,6 +243,7 @@ def addNote(request, pk):
                               { 'form': form, 'restaurant':res, 'user':request.user })
     
 def updateNote(request, pk):
+    # Check to see if there is an existing note
     if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
             return JsonResponse({
             'success': False, 
@@ -236,6 +257,7 @@ def updateNote(request, pk):
             })
     
     res = get_object_or_404(Restaurant, pk=pk)
+    # There is an existing note and the user indeed would like to update it.
     existing_note = URRestaurant.objects.get(user=request.user, obj_id=pk)
     form = NoteForm(request.POST or None, instance=existing_note)
     if form.is_valid():
@@ -249,6 +271,7 @@ def updateNote(request, pk):
                               { 'form': form, 'restaurant':res, 'user':request.user })
     
 def deleteNote(request, pk):
+    # Check to see if there is an existing note.
     if not URRestaurant.objects.filter(user=request.user, obj_id=pk).exists():
             return JsonResponse({
             'success': False, 
@@ -260,7 +283,7 @@ def deleteNote(request, pk):
                 'success': False, 
                 'err_code': 'Note_non_existed', 
             })
-    
+    # set the note to be None.
     existing_note = URRestaurant.objects.get(user=request.user, obj_id=pk)
     existing_note.note = "None"
     # check to see if there is a need to remove the record
@@ -286,9 +309,15 @@ class CommunityView(LoginRequiredMixin,generic.ListView):
 
        
 def search_form(request):
+    """
+    A simple view handler that redirects user to the search page.
+    """
     return render(request, 'searchf.html')
 
 def search2(request):
+    """
+    A simple search function. Could include complicated logic in the future.
+    """
     if 'q' in request.GET:
         query = request.GET.get('q')
         if query:

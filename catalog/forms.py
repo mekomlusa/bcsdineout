@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.forms import BaseModelFormSet
 
+# Form for user registration.
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
     last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
@@ -14,7 +15,8 @@ class SignUpForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(SignUpForm, self).__init__(*args, **kwargs)
         self.fields['password1'].help_text = 'Your password can''t be too similar to your other personal information. Your password must contain at least 8 characters. Your password can''t be a commonly used password. Your password can''t be entirely numeric.'
-        
+
+# Form for the user-restaurant-favorite system.        
 class NoteForm(forms.ModelForm):
     note = forms.CharField(max_length=1000,
                            help_text="Enter your note to the restaurant here. Maximum length 1000.",
@@ -33,23 +35,4 @@ class NoteForm(forms.ModelForm):
     class Meta:
         model = URRestaurant
         fields = ('note', )
-
-class SearchForm(forms.ModelForm):
-    keyword = forms.CharField(max_length=100,
-                           help_text="Enter your search term here. Maximum length 100.",
-                           required=True)
-
-    def clean_q(self):
-        data = self.cleaned_data['keyword']
-        
-        #Check the length of the note.
-        if len(data) > 1000:
-            raise ValidationError(_('Invalid input - maximum characters allowed: 100'))
-
-        # Remember to always return the cleaned data.
-        return data
-    
-    class Meta:
-        model = Restaurant
-        fields = ('keyword', )
        

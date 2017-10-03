@@ -93,7 +93,7 @@ $(function () {
           </li>
 		  {% else %}
 		  <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Join Us!</a>
+            <a class="nav-link dropdown-toggle" href="" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Have an account?</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
               <a class="dropdown-item" href="{% url 'login'%}?next={{request.path}}">Log in</a>
               <a class="dropdown-item" href="{% url 'user-signup' %}">Sign up</a>
