@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '5y*lna-=j)b)2fs@gx#x&ug3cowusf
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 DEBUG = False
-DEBUG404 - True
+DEBUG404 = True
 
 # Admin to receive debug message
 ADMINS = (('mlusa', 'rlin225@tamu.edu'),)
