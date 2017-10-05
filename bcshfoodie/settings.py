@@ -25,7 +25,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '5y*lna-=j)b)2fs@gx#x&ug3cowusfdzo^jt@%f7b0edv4!vnz')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
+# DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
+DEBUG = False
+DEBUG404 - True
+
+# Admin to receive debug message
+ADMINS = (('mlusa', 'rlin225@tamu.edu'),)
 
 ALLOWED_HOSTS = [
 'mighty-lake-95591.herokuapp.com',

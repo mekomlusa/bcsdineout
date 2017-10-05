@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.contrib import admin
+import os
 
 
 urlpatterns = [
@@ -37,3 +38,9 @@ urlpatterns += [
     url(r'^search/$', views.search2, name='result'),
     
 ]
+
+# to serve static files with DEBUG closed
+if settings.DEBUG is False:  
+    urlpatterns += patterns('',
+            url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+    )
