@@ -8,14 +8,13 @@
     <meta name="author" content="">
     <link rel="icon" href="http://getbootstrap.com/favicon.ico">
 
+	<link rel="stylesheet" href="http://getbootstrap.com/dist/css/bootstrap.min.css">
+
     <title>BCSH Foodie Guide</title>
-
-    <!-- Bootstrap core CSS -->
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-
 	
 	{% load static %}
-	<link rel="stylesheet" href="{% static 'css/cover.css' %}">  
+	<link rel="stylesheet" href="{% static 'css/cover.css' %}">
+	<!-- link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" -->
   
   </head>
 
@@ -33,12 +32,13 @@
               <nav class="nav nav-masthead">
                 <a class="nav-link active" href="{% url 'index' %}">Home</a>
                 <a class="nav-link" href="{% url 'search' %}">Search</a>
-                
+					
 					<a class="nav-link dropdown-toggle" href="" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Details</a>
 					<div class="dropdown-menu" aria-labelledby="dropdown01">
 					  <a class="dropdown-item" href="{% url 'restaurants' %}">All Restaurants</a>
 					  <a class="dropdown-item" href="{% url 'categories' %}">All Categories</a>
 					</div>
+					
 					
 					
 					
@@ -84,8 +84,8 @@
       </div>
 
     </div>
-
-    <!-- Bootstrap core JavaScript
+	
+	<!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -94,5 +94,7 @@
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+
   </body>
+
 </html>
