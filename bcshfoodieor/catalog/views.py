@@ -308,3 +308,6 @@ def search2(request):
     else:
         message = 'You submitted an empty form.'
     return HttpResponse(message)
+
+def index_test(request):
+    return render(request, 'index2.html')

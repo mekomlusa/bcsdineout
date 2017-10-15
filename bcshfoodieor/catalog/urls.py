@@ -37,7 +37,7 @@ urlpatterns = [
         url(r'^categories/$', views.CategoryListView.as_view(), name='categories'),
         url(r'^category/(?P<stub>[-\w ]+)/$', views.CategoryList2View.as_view(), name='category-list-2'),
         url(r'^myfavres/$', views.FavByUserListView.as_view(), name='my-fav-res'),
-    
+        url(r'^index2/$', views.index_test, name='index_test'),
 ]
 
 #app_name = 'ajax'
