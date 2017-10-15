@@ -1,98 +1,35 @@
+{% extends "base_generic.html" %}
+{% load bootstrap3 %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
+{% block content %}
+</br></br></br></br>
+<h1>BCSH Foodie Home</h1>
 
-    <title>BCSH Foodie Guide</title>
-	
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	
-	{% load static %}
-	<link rel="stylesheet" href="{% static 'css/cover.css' %}">
+  <p>Welcome to <em>BCSH Foodie Guide</em>, a very basic site that can help you navigate restaurants around the BCSH area.</p>
+  <p><em>BCSH: Bryan/College Station, and... Houston!</p>
+  <p>The dataset is last updated in September 2017.</p>
+
+  <a href="/"><img src="https://image.ibb.co/iH7VB5/636201892575795318_861220656_food.jpg" alt="Food" style="width:304px;height:228px;"></a>
+  </br> </br>
   
-  </head>
+  <form action={% url 'restaurant-random' %}>
+  {% buttons %}
+		<button type="submit" class="btn btn-primary" value="PICK A RESTAURANT FOR ME PLEASE!!!" />
+		{% bootstrap_icon "thumbs-up" %} PICK A RESTAURANT FOR ME PLEASE!!!
+		</button>
+	{% endbuttons %}
+	</form>
+  
+<h2>Dynamic counts</h2>
 
-  <body>
+  <p>The guide has the following record counts:</p>
+  <ul>
+    <li><strong>Categories:</strong> {{ num_category }}</li>
+    <li><strong>Restaurants:</strong> {{ num_restaurant }}</li>
+    <li><strong>Restaurants in the Bryan/College Station area:</strong> {{ num_bcs_res }}</li>
+    <li><strong>Yelp Reviews:</strong> {{ num_yelp_review }}</li>
+  </ul>
+  
+  <p>You have visited this page {{ num_visits }}{% if num_visits == 1 %} time{% else %} times{% endif %}.</p>
 
-    <div class="site-wrapper">
-
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-          <div class="masthead clearfix">
-            <div class="inner">
-              <h3 class="masthead-brand">BCSH Foodie</h3>
-              <nav class="nav nav-masthead">
-                <a class="nav-link active" href="{% url 'index' %}">Home</a>
-                <a class="nav-link" href="{% url 'search' %}">Search</a>
-                
-					<a class="nav-link dropdown-toggle" href="" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Details</a>
-					<div class="dropdown-menu" aria-labelledby="dropdown01">
-					  <a class="dropdown-item" href="{% url 'restaurants' %}">All Restaurants</a>
-					  <a class="dropdown-item" href="{% url 'categories' %}">All Categories</a>
-					</div>
-					
-					
-					
-					<ul class="navbar-nav">
-					{% if user.is_authenticated %}
-		  
-					<a class="nav-link dropdown-toggle" href="" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ user.get_username }}</a>
-					<div class="dropdown-menu" aria-labelledby="dropdown02">
-					  <a class="dropdown-item" href="{% url 'my-fav-res' %}">My Restaurant Profile</a>
-					  <a class="dropdown-item" href="{% url 'community' %}">Community Status</a>
-					  <a class="dropdown-item" href="{% url 'password_reset' %}">Reset Password</a>
-					  <a class="dropdown-item" href="{% url 'logout'%}?next={{request.path}}">Logout</a>
-					</div>
-				  
-				  {% else %}
-		 
-					<a class="nav-link dropdown-toggle" href="" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Have an account?</a>
-					<div class="dropdown-menu" aria-labelledby="dropdown03">
-					  <a class="dropdown-item" href="{% url 'login'%}?next={{request.path}}">Log in</a>
-					  <a class="dropdown-item" href="{% url 'user-signup' %}">Sign up</a>
-					</div>
-				  {% endif %}
-					</ul>
-              </nav>
-            </div>
-          </div>
-		  
-
-          <div class="inner cover">
-            <h1 class="cover-heading">BCSH Foodie Home</h1>
-            <p class="lead">Welcome to <em>BCSH Foodie Guide</em>, a very basic site that can help you navigate restaurants around the BCSH area.</p>
-			<p><em>BCSH: Bryan/College Station, and... Houston!</p>
-            <p class="lead">
-              <a href="{% url 'restaurant-random' %}" class="btn btn-lg btn-secondary">I'm starving</a>
-            </p>
-			
-			
-          </div>
-          
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="http://getbootstrap.com/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="http://getbootstrap.com/assets/js/vendor/popper.min.js"></script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-  </body>
-</html>
+{% endblock %}
